@@ -195,7 +195,11 @@ public class NmsAdapter implements PaperNmsInterface {
         // uninject existing connections
         MinecraftServer server = MinecraftServer.getServer();
         for (Connection connection : server.getConnection().getConnections()) {
-            connection.channel.pipeline().remove(BETTERVIEW_HANDLER);
+            connection.channel.eventLoop().execute(() -> {
+                if (connection.channel.isActive()) {
+                    connection.channel.pipeline().remove(BETTERVIEW_HANDLER);
+                }
+            });
         }
         // uninject post-join handling
         WrappedServerTickManager.uninject(server);
