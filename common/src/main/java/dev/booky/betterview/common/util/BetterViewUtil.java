@@ -3,6 +3,7 @@ package dev.booky.betterview.common.util;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Ticker;
 import dev.booky.betterview.common.ChunkCacheEntry;
 import dev.booky.betterview.common.hooks.LevelHook;
 import io.netty.buffer.ByteBuf;
@@ -30,6 +31,7 @@ public final class BetterViewUtil {
     public static LoadingCache<McChunkPos, ChunkCacheEntry> buildCache(LevelHook level) {
         return Caffeine.newBuilder()
                 .expireAfterWrite(level.getConfig().getCacheDuration())
+                .ticker(Ticker.systemTicker())
                 .<McChunkPos, ChunkCacheEntry>removalListener((key, val, cause) -> {
                     if (val != null) {
                         val.release();
