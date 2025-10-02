@@ -61,7 +61,7 @@ public class PaperPlayer implements PlayerHook {
     public void sendChunkUnload(int chunkX, int chunkZ) {
         ByteBuf packetId = PaperNmsInterface.SERVICE.getClientboundForgetLevelChunkPacketId();
         ByteBuf chunkPos = BetterViewUtil.encodeChunkPos(McChunkPos.getChunkKey(chunkX, chunkZ));
-        CompositeByteBuf packetBuf = PooledByteBufAllocator.DEFAULT.compositeBuffer(2)
+        CompositeByteBuf packetBuf = BetterViewUtil.ALLOC.compositeBuffer(2)
                 .addComponent(true, packetId)
                 .addComponent(true, chunkPos);
         this.getNettyChannel().write(new BypassedPacket(packetBuf));

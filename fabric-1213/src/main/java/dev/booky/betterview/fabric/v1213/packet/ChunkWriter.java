@@ -3,6 +3,7 @@ package dev.booky.betterview.fabric.v1213.packet;
 
 import ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
+import dev.booky.betterview.common.util.BetterViewUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -74,7 +75,7 @@ public final class ChunkWriter {
             LevelChunkSection[] sections, byte[][] blockLight, byte @Nullable [][] skyLight
     ) {
         // allocate pooled buffer
-        ByteBuf buf = PooledByteBufAllocator.DEFAULT.directBuffer();
+        ByteBuf buf = BetterViewUtil.ALLOC.buffer();
         try {
             // packet id
             buf.writeByte(PacketUtil.LEVEL_CHUNK_WITH_LIGHT_PACKET_ID);
@@ -98,7 +99,7 @@ public final class ChunkWriter {
         FriendlyByteBuf.writeNbt(buf, heightmapsTag);
         // allocate sub-buffer if we're using anti-xray
         if (antiXray != null) {
-            ByteBuf subBuf = PooledByteBufAllocator.DEFAULT.buffer();
+            ByteBuf subBuf = BetterViewUtil.ALLOC.buffer();
             try {
                 FriendlyByteBuf friendlyBuf = new FriendlyByteBuf(subBuf);
                 for (int i = 0, len = sections.length; i < len; i++) {

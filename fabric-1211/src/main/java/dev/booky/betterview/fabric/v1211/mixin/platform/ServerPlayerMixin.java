@@ -98,7 +98,7 @@ public abstract class ServerPlayerMixin extends Player {
     public void betterview$sendChunkUnload(int chunkX, int chunkZ) {
         ByteBuf packetId = PacketUtil.FORGET_LEVEL_CHUNK_PACKET_ID_BUF.retainedSlice();
         ByteBuf chunkPos = BetterViewUtil.encodeChunkPos(McChunkPos.getChunkKey(chunkX, chunkZ));
-        CompositeByteBuf packetBuf = PooledByteBufAllocator.DEFAULT.compositeBuffer(2)
+        CompositeByteBuf packetBuf = BetterViewUtil.ALLOC.compositeBuffer(2)
                 .addComponent(true, packetId)
                 .addComponent(true, chunkPos);
         ((PlayerHook) this).getNettyChannel().write(new BypassedPacket(packetBuf));

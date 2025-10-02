@@ -3,6 +3,7 @@ package dev.booky.betterview.nms.v1215;
 
 import com.destroystokyo.paper.util.SneakyThrow;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
+import dev.booky.betterview.common.util.BetterViewUtil;
 import dev.booky.betterview.nms.ReflectionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -78,7 +79,7 @@ public final class ChunkWriter {
             LevelChunkSection[] sections, byte[][] blockLight, byte @Nullable [][] skyLight
     ) {
         // allocate pooled buffer
-        ByteBuf buf = PooledByteBufAllocator.DEFAULT.directBuffer();
+        ByteBuf buf = BetterViewUtil.ALLOC.buffer();
         try {
             // packet id
             buf.writeByte(NmsAdapter.LEVEL_CHUNK_WITH_LIGHT_PACKET_ID);
@@ -124,7 +125,7 @@ public final class ChunkWriter {
         writeHeightmaps(buf, heightmapsData);
         // allocate sub-buffer if we're using anti-xray
         if (antiXray != null) {
-            ByteBuf subBuf = PooledByteBufAllocator.DEFAULT.buffer();
+            ByteBuf subBuf = BetterViewUtil.ALLOC.buffer();
             try {
                 FriendlyByteBuf friendlyBuf = new FriendlyByteBuf(subBuf);
                 for (int i = 0, len = sections.length; i < len; i++) {

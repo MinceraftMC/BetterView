@@ -73,7 +73,7 @@ public class PaperLevel implements LevelHook {
     @Override
     public ByteBuf getEmptyChunkBuf(McChunkPos chunkPos) {
         ByteBuf posBuf = BetterViewUtil.encodeChunkPos(chunkPos.getX(), chunkPos.getZ());
-        return PooledByteBufAllocator.DEFAULT.compositeBuffer(3)
+        return BetterViewUtil.ALLOC.compositeBuffer(3)
                 .addComponent(true, PaperNmsInterface.SERVICE.getClientboundLevelChunkWithLightPacketId())
                 .addComponent(true, posBuf)
                 .addComponent(true, this.emptyChunkData.retainedSlice());

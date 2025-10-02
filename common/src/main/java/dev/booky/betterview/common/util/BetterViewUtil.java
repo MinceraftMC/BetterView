@@ -6,11 +6,20 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import dev.booky.betterview.common.ChunkCacheEntry;
 import dev.booky.betterview.common.hooks.LevelHook;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public final class BetterViewUtil {
+
+    private static final boolean ALLOC_UNPOOLED = Boolean.getBoolean("betterview.alloc.unpooled");
+    private static final boolean ALLOC_HEAP = Boolean.getBoolean("betterview.alloc.heap");
+    public static final ByteBufAllocator ALLOC = ALLOC_UNPOOLED
+            ? new UnpooledByteBufAllocator(!ALLOC_HEAP)
+            : new PooledByteBufAllocator(!ALLOC_HEAP);
 
     public static final int MC_MAX_DIMENSION_SIZE = 30_000_000;
     public static final int MC_MAX_DIMENSION_SIZE_CHUNKS = MC_MAX_DIMENSION_SIZE << 4;

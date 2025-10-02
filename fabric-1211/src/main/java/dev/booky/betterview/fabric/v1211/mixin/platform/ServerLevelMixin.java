@@ -160,7 +160,7 @@ public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
 
     public ByteBuf betterview$getEmptyChunkBuf(McChunkPos chunkPos) {
         ByteBuf posBuf = BetterViewUtil.encodeChunkPos(chunkPos.getX(), chunkPos.getZ());
-        return PooledByteBufAllocator.DEFAULT.compositeBuffer(3)
+        return BetterViewUtil.ALLOC.compositeBuffer(3)
                 .addComponent(true, PacketUtil.LEVEL_CHUNK_WITH_LIGHT_PACKET_ID_BUF.retainedSlice())
                 .addComponent(true, posBuf)
                 .addComponent(true, this.emptyChunkData.retainedSlice());
