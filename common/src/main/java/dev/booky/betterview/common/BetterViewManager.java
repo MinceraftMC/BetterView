@@ -168,8 +168,16 @@ public final class BetterViewManager {
         this.levels.remove(worldName.asString());
     }
 
-    public PlayerHook getPlayer(UUID playerId) {
+    public @Nullable PlayerHook getPlayerOrNull(UUID playerId) {
         return this.players.computeIfAbsent(playerId, this.hook::constructPlayer);
+    }
+
+    public PlayerHook getPlayer(UUID playerId) {
+        PlayerHook player = this.getPlayerOrNull(playerId);
+        if (player == null) {
+            throw new IllegalStateException("Can't construct player " + playerId);
+        }
+        return player;
     }
 
     public void unregisterPlayer(UUID playerId) {

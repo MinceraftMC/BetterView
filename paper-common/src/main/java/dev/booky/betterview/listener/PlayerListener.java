@@ -20,13 +20,13 @@ public class PlayerListener implements Listener {
         this.manager = manager;
         // initialize players which are already online
         for (Player player : Bukkit.getOnlinePlayers()) {
-            this.manager.getPlayer(player.getUniqueId());
+            this.manager.getPlayerOrNull(player.getUniqueId());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
-        this.manager.getPlayer(event.getPlayer().getUniqueId());
+        this.manager.getPlayerOrNull(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

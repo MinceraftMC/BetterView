@@ -2,6 +2,7 @@ package dev.booky.betterview.nms.v1215;
 // Created by booky10 in BetterView (23:37 03.06.2025)
 
 import dev.booky.betterview.common.BetterViewManager;
+import dev.booky.betterview.common.hooks.PlayerHook;
 import dev.booky.betterview.nms.ReflectionUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerTickRateManager;
@@ -81,8 +82,10 @@ public class WrappedServerTickManager extends ServerTickRateManager {
     @Override
     public void updateJoiningPlayer(ServerPlayer player) {
         // trigger logic start
-        this.manager.getPlayer(player.getUUID())
-                .getBvPlayer().tryTriggerStart();
+        PlayerHook hook = this.manager.getPlayerOrNull(player.getUUID());
+        if (hook != null) {
+            hook.getBvPlayer().tryTriggerStart();
+        }
 
         super.updateJoiningPlayer(player);
     }

@@ -32,7 +32,7 @@ public class PlayerListMixin {
     )
     private void postPlayerAdd(CallbackInfo ci, @Local(argsOnly = true) ServerPlayer player) {
         BetterViewManager manager = BetterViewMod.INSTANCE.getManager();
-        manager.getPlayer(player.getUUID()); // load player
+        manager.getPlayerOrNull(player.getUUID()); // load player
     }
 
     @Inject(
@@ -62,7 +62,7 @@ public class PlayerListMixin {
         // unregister player with this uuid and register again to handle respawning
         BetterViewManager manager = BetterViewMod.INSTANCE.getManager();
         manager.unregisterPlayer(player.getUUID());
-        manager.getPlayer(player.getUUID()); // load new player instance
+        manager.getPlayerOrNull(player.getUUID()); // load new player instance
 
         // replace player hook in BV player (which was transferred from the previous player)
         ((PlayerHook) player).getBvPlayer().replacePlayer((PlayerHook) player);
