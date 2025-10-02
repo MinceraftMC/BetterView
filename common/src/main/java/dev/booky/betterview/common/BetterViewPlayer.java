@@ -7,6 +7,7 @@ import dev.booky.betterview.common.util.BypassedPacket;
 import dev.booky.betterview.common.util.ChunkIterationUtil;
 import dev.booky.betterview.common.util.McChunkPos;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.ReferenceCountUtil;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -276,8 +277,13 @@ public final class BetterViewPlayer {
     }
 
     public void purgeQueue(int chunkX, int chunkZ) {
-        this.chunkQueue.removeIf(entry ->
-                entry.chunkPos.getX() == chunkX && entry.chunkPos.getZ() == chunkZ);
+        this.chunkQueue.removeIf(entry -> {
+            if (entry.chunkPos.getX() == chunkX && entry.chunkPos.getZ() == chunkZ) {
+                entry.release();
+                return true;
+            }
+            return false;
+        });
     }
 
     public boolean checkQueueEntry(ChunkQueueEntry entry) {
@@ -290,6 +296,7 @@ public final class BetterViewPlayer {
         int chunkIndex = calcIndex(chunkPos.getX(), chunkPos.getZ(), this.storageDiameter);
         ChunkState state = this.chunkStates[chunkIndex];
         if (state.lifecycle != BV_QUEUED) {
+            entry.release();
             return true; // chunk no longer queued, remove entry
         }
 
@@ -299,16 +306,18 @@ public final class BetterViewPlayer {
             LOGGER.error("Error while building chunk {} for {} in {}",
                     chunkPos, this.player, this.level, exception);
             state.lifecycle = UNLOADED;
+            entry.release();
             return true;
         }
 
         ByteBuf chunkBuf = entry.future.getNow(null);
         if (chunkBuf == null) {
-            // ran into generation limit, try again later
+            // probably ran into generation limit, try again later
             state.lifecycle = UNLOADED;
             // reset iteration index to prevent this entry from getting skipped
             // until all other chunks have been loaded
             this.iterationIndex = 0;
+            entry.release();
             return true;
         }
 
@@ -319,6 +328,7 @@ public final class BetterViewPlayer {
                 : this.level.getEmptyChunkBuf(chunkPos);
         this.player.getNettyChannel().write(new BypassedPacket(finalChunkBuf));
         state.lifecycle = BV_LOADED; // mark chunk as loaded by BV
+        entry.release();
         return true;
     }
 
@@ -342,7 +352,7 @@ public final class BetterViewPlayer {
             }
         }
         // clear all chunks which are currently queued for sending
-        this.chunkQueue.clear();
+        this.clearChunkQueue();
     }
 
     public void handleDimensionReset(@Nullable Object networkDimension) {
@@ -357,7 +367,7 @@ public final class BetterViewPlayer {
         for (int i = 0, len = this.chunkStates.length; i < len; i++) {
             this.chunkStates[i].set(0, 0, UNLOADED);
         }
-        this.chunkQueue.clear();
+        this.clearChunkQueue();
         // disable temporarily
         this.disable();
     }
@@ -410,6 +420,17 @@ public final class BetterViewPlayer {
         this.player.sendViewDistancePacket(this.getServerViewDistance());
     }
 
+    public void release() {
+        this.clearChunkQueue();
+    }
+
+    public void clearChunkQueue() {
+        for (ChunkQueueEntry entry : this.chunkQueue) {
+            entry.release();
+        }
+        this.chunkQueue.clear();
+    }
+
     public enum ChunkLifecycle {
         UNLOADED,
         SERVER_LOADED,
@@ -437,5 +458,16 @@ public final class BetterViewPlayer {
     public record ChunkQueueEntry(
             McChunkPos chunkPos,
             CompletableFuture<@Nullable ByteBuf> future
-    ) {}
+    ) {
+
+        public ChunkQueueEntry retain() {
+            this.future.thenApply(ReferenceCountUtil::retain);
+            return this;
+        }
+
+        public ChunkQueueEntry release() {
+            this.future.thenApply(ReferenceCountUtil::release);
+            return this;
+        }
+    }
 }

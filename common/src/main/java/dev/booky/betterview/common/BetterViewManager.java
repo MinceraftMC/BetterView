@@ -147,7 +147,8 @@ public final class BetterViewManager {
 
             // start building chunk queue and add to processing queue
             CompletableFuture<@Nullable ByteBuf> future = level.getChunkCache().get(nextChunk).get();
-            bv.chunkQueue.add(new ChunkQueueEntry(nextChunk, future));
+            ChunkQueueEntry queueEntry = new ChunkQueueEntry(nextChunk, future);
+            bv.chunkQueue.add(queueEntry.retain());
 
             // check if a limit has been reached
             if (chunksPerTick-- <= 0) {
@@ -181,7 +182,8 @@ public final class BetterViewManager {
     }
 
     public void unregisterPlayer(UUID playerId) {
-        this.players.remove(playerId);
+        PlayerHook player = this.players.remove(playerId);
+        player.getNettyChannel().eventLoop().execute(player.getBvPlayer()::release);
     }
 
     public BvLevelConfig getConfig(Key worldName) {
