@@ -6,6 +6,7 @@ import dev.booky.betterview.nms.ReflectionUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerTickRateManager;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.TickRateManager;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.invoke.VarHandle;
@@ -28,6 +29,19 @@ public class WrappedServerTickManager extends ServerTickRateManager {
             ReflectionUtil.getField(ServerTickRateManager.class, long.class, 3);
     private static final VarHandle PREVIOUS_IS_FROZEN =
             ReflectionUtil.getField(ServerTickRateManager.class, boolean.class, 0);
+    private static final VarHandle SILENT =
+            ReflectionUtil.getField(ServerTickRateManager.class, boolean.class, 1);
+
+    private static final VarHandle TICKRATE =
+            ReflectionUtil.getField(TickRateManager.class, float.class, 1);
+    private static final VarHandle NANOSECONDS_PER_TICK =
+            ReflectionUtil.getField(TickRateManager.class, long.class, 0);
+    private static final VarHandle FROZEN_TICKS_TO_RUN =
+            ReflectionUtil.getField(TickRateManager.class, int.class, 0);
+    private static final VarHandle RUN_GAME_ELEMENTS =
+            ReflectionUtil.getField(TickRateManager.class, boolean.class, 0);
+    private static final VarHandle IS_FROZEN =
+            ReflectionUtil.getField(TickRateManager.class, boolean.class, 1);
 
     private final BetterViewManager manager;
     private final ServerTickRateManager delegate;
@@ -43,6 +57,13 @@ public class WrappedServerTickManager extends ServerTickRateManager {
         SPRINT_TIME_SPEND.set(this, SPRINT_TIME_SPEND.get(delegate));
         SCHEDULED_CURRENT_SPRINT_TICKS.set(this, SCHEDULED_CURRENT_SPRINT_TICKS.get(delegate));
         PREVIOUS_IS_FROZEN.set(this, PREVIOUS_IS_FROZEN.get(delegate));
+        SILENT.set(this, SILENT.get(delegate));
+
+        TICKRATE.set(this, TICKRATE.get(delegate));
+        NANOSECONDS_PER_TICK.set(this, NANOSECONDS_PER_TICK.get(delegate));
+        FROZEN_TICKS_TO_RUN.set(this, FROZEN_TICKS_TO_RUN.get(delegate));
+        RUN_GAME_ELEMENTS.set(this, RUN_GAME_ELEMENTS.get(delegate));
+        IS_FROZEN.set(this, IS_FROZEN.get(delegate));
     }
 
     public static void inject(MinecraftServer server, BetterViewManager manager) {
