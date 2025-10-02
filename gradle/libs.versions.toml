@@ -1,10 +1,10 @@
 [versions]
 # plugins
-paperweight = "2.0.0-beta.17"
-shadow = "8.3.6"
-loom = "1.10-SNAPSHOT"
+paperweight = "2.0.0-beta.19"
+shadow = "8.3.9"
+loom = "1.11-SNAPSHOT"
 pluginyml = "0.6.0"
-runtask = "2.3.1"
+runtask = "3.0.0"
 
 # common
 slf4j = "2.0.17"
@@ -22,6 +22,7 @@ paper-v1211 = "1.21.1-R0.1-SNAPSHOT"
 paper-v1213 = "1.21.3-R0.1-SNAPSHOT"
 paper-v1214 = "1.21.4-R0.1-SNAPSHOT"
 paper-v1215 = "1.21.5-R0.1-SNAPSHOT"
+paper-v1219 = "1.21.9-R0.1-SNAPSHOT"
 bstats = "3.1.0"
 
 # fabric
@@ -46,8 +47,8 @@ adventure-platform-fabric-v1215 = "6.4.0"
 moonrise-v1216 = "zxeCwQuS" # https://modrinth.com/mod/moonrise-opt/version/zxeCwQuS
 minecraft-v1217 = "1.21.7"
 parchment-v1217 = "2025.06.29"
-moonrise-v1217 = "deKWI7rK" # https://modrinth.com/mod/moonrise-opt/version/deKWI7rK
-adventure-platform-fabric-v1217 = "6.5.0-SNAPSHOT"
+moonrise-v1217 = "70KoSrYl" # https://modrinth.com/mod/moonrise-opt/version/70KoSrYl
+adventure-platform-fabric-v1217 = "6.6.0"
 
 [plugins]
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }

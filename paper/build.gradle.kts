@@ -40,7 +40,7 @@ tasks.withType<ShadowJar> {
     // relocate shaded dependencies
     mapOf(
         "org.bstats" to "bstats"
-    ).forEach { key, value ->
+    ).forEach { (key, value) ->
         relocate(key, "${project.group}.libs.$value")
     }
 }
@@ -59,5 +59,5 @@ configure<BukkitPluginDescription> {
 }
 
 tasks.named<RunServer>("runServer") {
-    minecraftVersion("1.21.7")
+    minecraftVersion("1.21.9")
 }

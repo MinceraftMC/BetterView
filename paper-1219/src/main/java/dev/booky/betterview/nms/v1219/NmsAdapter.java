@@ -1,8 +1,8 @@
-package dev.booky.betterview.nms.v1211;
+package dev.booky.betterview.nms.v1219;
 // Created by booky10 in BetterView (16:37 03.06.2025)
 
-import ca.spottedleaf.concurrentutil.executor.standard.PrioritisedExecutor;
-import ca.spottedleaf.moonrise.common.util.ChunkSystem;
+import ca.spottedleaf.concurrentutil.util.Priority;
+import ca.spottedleaf.moonrise.common.PlatformHooks;
 import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder;
 import dev.booky.betterview.common.BetterViewManager;
 import dev.booky.betterview.common.BetterViewPlayer;
@@ -22,7 +22,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -53,15 +52,15 @@ import java.util.stream.Stream;
 public class NmsAdapter implements PaperNmsInterface {
 
     // magic packet id values
-    static final byte FORGET_LEVEL_CHUNK_PACKET_ID = 0x21;
+    static final byte FORGET_LEVEL_CHUNK_PACKET_ID = 0x25;
     static final ByteBuf FORGET_LEVEL_CHUNK_PACKET_ID_BUF =
             Unpooled.wrappedBuffer(new byte[]{FORGET_LEVEL_CHUNK_PACKET_ID});
-    static final byte LEVEL_CHUNK_WITH_LIGHT_PACKET_ID = 0x27;
+    static final byte LEVEL_CHUNK_WITH_LIGHT_PACKET_ID = 0x2C;
     static final ByteBuf LEVEL_CHUNK_WITH_LIGHT_PACKET_ID_BUF =
             Unpooled.wrappedBuffer(new byte[]{LEVEL_CHUNK_WITH_LIGHT_PACKET_ID});
 
     public NmsAdapter() {
-        if (SharedConstants.getProtocolVersion() != 767) {
+        if (SharedConstants.getProtocolVersion() != 773) {
             throw new UnsupportedOperationException();
         }
     }
@@ -135,7 +134,7 @@ public class NmsAdapter implements PaperNmsInterface {
     public CompletableFuture<ByteBuf> loadChunk(World world, @Nullable AntiXrayProcessor antiXray, int chunkX, int chunkZ) {
         CompletableFuture<ByteBuf> future = new CompletableFuture<>();
         ServerLevel level = ((CraftWorld) world).getHandle();
-        ChunkSystem.scheduleChunkLoad(level, chunkX, chunkZ, true, ChunkStatus.LIGHT, true, PrioritisedExecutor.Priority.LOW,
+        PlatformHooks.get().scheduleChunkLoad(level, chunkX, chunkZ, true, ChunkStatus.LIGHT, true, Priority.LOW,
                 chunk -> future.completeAsync(() -> ChunkWriter.writeFullOrEmpty(chunk, antiXray)));
         return future;
     }
@@ -158,17 +157,17 @@ public class NmsAdapter implements PaperNmsInterface {
     @Override
     public ByteBuf buildEmptyChunkData(World world, @Nullable AntiXrayProcessor antiXray) {
         ServerLevel level = ((CraftWorld) world).getHandle();
-        Registry<Biome> biomeRegistry = level.registryAccess().registryOrThrow(Registries.BIOME);
-        Holder.Reference<Biome> biome = biomeRegistry.getHolderOrThrow(Biomes.THE_VOID);
+        Registry<Biome> biomeRegistry = level.registryAccess().lookupOrThrow(Registries.BIOME);
+        Holder.Reference<Biome> biome = biomeRegistry.getOrThrow(Biomes.THE_VOID);
         EmptyLevelChunk chunk = new EmptyLevelChunk(level, ChunkPos.ZERO, biome);
 
         ByteBuf buf = Unpooled.buffer();
         try {
-            CompoundTag heightmapsTag = ChunkWriter.extractHeightmapsTag(chunk);
+            long[] @Nullable [] heightmapsData = ChunkWriter.extractHeightmapsData(chunk);
             byte[][] blockLight = LightWriter.convertStarlightToBytes(chunk.starlight$getBlockNibbles(), false);
             byte[][] skyLight = LightWriter.convertStarlightToBytes(chunk.starlight$getSkyNibbles(), true);
-            ChunkWriter.writeFullBody(buf, antiXray, level.getMinSection(),
-                    heightmapsTag, chunk.getSections(), blockLight, skyLight);
+            ChunkWriter.writeFullBody(buf, antiXray, level.getMinSectionY(),
+                    heightmapsData, chunk.getSections(), blockLight, skyLight);
             return buf.retain();
         } finally {
             buf.release();
@@ -227,7 +226,7 @@ public class NmsAdapter implements PaperNmsInterface {
         };
         Function<Key, Stream<Integer>> stateListFn = key -> {
             ResourceLocation blockKey = ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value());
-            return BuiltInRegistries.BLOCK.getHolder(blockKey)
+            return BuiltInRegistries.BLOCK.get(blockKey)
                     .orElseThrow().value().getStateDefinition().getPossibleStates()
                     .stream().map(Block.BLOCK_STATE_REGISTRY::getIdOrThrow);
         };
