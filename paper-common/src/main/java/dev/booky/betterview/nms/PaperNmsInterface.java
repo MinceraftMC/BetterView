@@ -33,6 +33,10 @@ public interface PaperNmsInterface {
 
     Channel getNettyChannel(Player player);
 
+    boolean isInjected(Channel channel);
+
+    boolean isFakeChannel(Channel channel);
+
     Object constructClientboundSetChunkCacheRadiusPacket(int distance);
 
     ByteBuf getClientboundForgetLevelChunkPacketId();

@@ -15,6 +15,7 @@ import dev.booky.betterview.nms.PaperNmsInterface;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.embedded.EmbeddedChannel;
 import io.papermc.paper.network.ChannelInitializeListenerHolder;
 import net.kyori.adventure.key.Key;
 import net.minecraft.SharedConstants;
@@ -86,6 +87,21 @@ public class NmsAdapter implements PaperNmsInterface {
     @Override
     public Channel getNettyChannel(Player player) {
         return ((CraftPlayer) player).getHandle().connection.connection.channel;
+    }
+
+    @Override
+    public boolean isInjected(Channel channel) {
+        return channel.pipeline().names().contains(BETTERVIEW_HANDLER);
+    }
+
+    @Override
+    public boolean isFakeChannel(Channel channel) {
+        // https://github.com/retrooper/packetevents/blob/197a3c956e5b68c5f5fcdf54f613ba4cf5ac4de5/api/src/main/java/com/github/retrooper/packetevents/util/FakeChannelUtil.java (GPL-3.0)
+        if (channel instanceof EmbeddedChannel) {
+            return true;
+        }
+        String name = channel.getClass().getSimpleName();
+        return "FakeChannel".equals(name) || "SpoofedChannel".equals(name);
     }
 
     @Override
