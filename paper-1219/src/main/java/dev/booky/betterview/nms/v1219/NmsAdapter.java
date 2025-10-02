@@ -1,4 +1,4 @@
-package dev.booky.betterview.nms.v1215;
+package dev.booky.betterview.nms.v1219;
 // Created by booky10 in BetterView (16:37 03.06.2025)
 
 import ca.spottedleaf.concurrentutil.util.Priority;
@@ -52,17 +52,15 @@ import java.util.stream.Stream;
 public class NmsAdapter implements PaperNmsInterface {
 
     // magic packet id values
-    static final byte FORGET_LEVEL_CHUNK_PACKET_ID = 0x21;
+    static final byte FORGET_LEVEL_CHUNK_PACKET_ID = 0x25;
     static final ByteBuf FORGET_LEVEL_CHUNK_PACKET_ID_BUF =
             Unpooled.wrappedBuffer(new byte[]{FORGET_LEVEL_CHUNK_PACKET_ID});
-    static final byte LEVEL_CHUNK_WITH_LIGHT_PACKET_ID = 0x27;
+    static final byte LEVEL_CHUNK_WITH_LIGHT_PACKET_ID = 0x2C;
     static final ByteBuf LEVEL_CHUNK_WITH_LIGHT_PACKET_ID_BUF =
             Unpooled.wrappedBuffer(new byte[]{LEVEL_CHUNK_WITH_LIGHT_PACKET_ID});
 
     public NmsAdapter() {
-        if (SharedConstants.getProtocolVersion() != 770
-                && SharedConstants.getProtocolVersion() != 771
-                && SharedConstants.getProtocolVersion() != 772) {
+        if (SharedConstants.getProtocolVersion() != 773) {
             throw new UnsupportedOperationException();
         }
     }

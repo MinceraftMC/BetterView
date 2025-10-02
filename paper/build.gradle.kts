@@ -40,7 +40,7 @@ tasks.withType<ShadowJar> {
     // relocate shaded dependencies
     mapOf(
         "org.bstats" to "bstats"
-    ).forEach { key, value ->
+    ).forEach { (key, value) ->
         relocate(key, "${project.group}.libs.$value")
     }
 }

@@ -1,4 +1,4 @@
-package dev.booky.betterview.nms.v1215;
+package dev.booky.betterview.nms.v1219;
 // Created by booky10 in BetterView (21:19 03.06.2025)
 
 import ca.spottedleaf.moonrise.common.util.WorldUtil;
@@ -11,7 +11,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -20,12 +19,10 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.PalettedContainerFactory;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.chunk.storage.SerializableChunkData;
 import org.jspecify.annotations.NullMarked;
@@ -35,7 +32,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.Optional;
 
-import static dev.booky.betterview.nms.v1215.ChunkWriter.SENDABLE_HEIGHTMAP_TYPES;
+import static dev.booky.betterview.nms.v1219.ChunkWriter.SENDABLE_HEIGHTMAP_TYPES;
 
 @NullMarked
 public final class ChunkTagTransformer {
@@ -80,8 +77,9 @@ public final class ChunkTagTransformer {
             byte[][] blockLight,
             byte @Nullable [][] skyLight
     ) {
-        Registry<Biome> biomeRegistry = level.registryAccess().lookupOrThrow(Registries.BIOME);
-        Codec<PalettedContainer<Holder<Biome>>> biomeCodec = makeBiomeCodecRW(biomeRegistry);
+        PalettedContainerFactory factory = level.palettedContainerFactory();
+        Codec<PalettedContainer<Holder<Biome>>> biomeCodec = factory.biomeContainerRWCodec();
+        Codec<PalettedContainer<BlockState>> blockCodec = factory.blockStatesContainerCodec();
 
         ListTag sectionTags = chunkTag.getListOrEmpty(SerializableChunkData.SECTIONS_TAG);
         int minLightSection = WorldUtil.getMinLightSection(level);
@@ -93,44 +91,13 @@ public final class ChunkTagTransformer {
             int sectionIndex = level.getSectionIndexFromSectionY(sectionY);
 
             if (sectionIndex >= 0 && sectionIndex < sections.length) {
-                BlockState[] presetBlockStates = level.chunkPacketBlockController
-                        .getPresetBlockStates(level, pos, sectionY);
+                PalettedContainer<BlockState> blocks = sectionTag.get("block_states") instanceof CompoundTag blockStatesTag
+                        ? blockCodec.parse(NbtOps.INSTANCE, blockStatesTag).getOrThrow()
+                        : factory.createForBlockStates();
 
-                PalettedContainer<BlockState> blocks;
-                if (sectionTag.get("block_states") instanceof CompoundTag blockStatesTag) {
-                    Codec<PalettedContainer<BlockState>> blockStateCodec;
-                    if (presetBlockStates != null) {
-                        blockStateCodec = PalettedContainer.codecRW(
-                                Block.BLOCK_STATE_REGISTRY,
-                                BlockState.CODEC,
-                                PalettedContainer.Strategy.SECTION_STATES,
-                                Blocks.AIR.defaultBlockState(),
-                                presetBlockStates
-                        );
-                    } else {
-                        blockStateCodec = SerializableChunkData.BLOCK_STATE_CODEC;
-                    }
-                    blocks = blockStateCodec.parse(NbtOps.INSTANCE, blockStatesTag).getOrThrow();
-                } else {
-                    blocks = new PalettedContainer<>(
-                            Block.BLOCK_STATE_REGISTRY,
-                            Blocks.AIR.defaultBlockState(),
-                            PalettedContainer.Strategy.SECTION_STATES,
-                            presetBlockStates
-                    );
-                }
-
-                PalettedContainer<Holder<Biome>> biomes;
-                if (sectionTag.get("biomes") instanceof CompoundTag biomesTag) {
-                    biomes = biomeCodec.parse(NbtOps.INSTANCE, biomesTag).getOrThrow();
-                } else {
-                    biomes = new PalettedContainer<>(
-                            biomeRegistry.asHolderIdMap(),
-                            biomeRegistry.getOrThrow(Biomes.PLAINS),
-                            PalettedContainer.Strategy.SECTION_BIOMES,
-                            null
-                    );
-                }
+                PalettedContainer<Holder<Biome>> biomes = sectionTag.get("biomes") instanceof CompoundTag biomesTag
+                        ? biomeCodec.parse(NbtOps.INSTANCE, biomesTag).getOrThrow()
+                        : factory.createForBiomes();
 
                 LevelChunkSection section = new LevelChunkSection(blocks, biomes);
                 sections[sectionIndex] = section;
