@@ -20,6 +20,7 @@ public final class ChunkCacheEntry {
     private final McChunkPos pos;
 
     private volatile @Nullable CompletableFuture<@Nullable ByteBuf> future;
+    private volatile boolean released = false;
 
     public ChunkCacheEntry(LevelHook level, McChunkPos pos) {
         this.level = level;
@@ -56,12 +57,16 @@ public final class ChunkCacheEntry {
     }
 
     public CompletableFuture<@Nullable ByteBuf> get() {
-        // all of this code runs synchronized on this cache entry to
+        // all of this code runs synchronized on this cache entry
         synchronized (this) {
+            if (this.released) {
+                throw new IllegalStateException("Can't get buffer for " + this.pos + " in "
+                        + this.level.getName() + ", cache entry has already been released");
+            }
             {
                 CompletableFuture<@Nullable ByteBuf> future = this.future;
                 if (future != null) {
-                    // future is valid, return immediately
+                    // future is already set, return
                     return future;
                 }
             }
@@ -69,6 +74,8 @@ public final class ChunkCacheEntry {
                     // launch chunk handling asynchronously to minimize lock time
                     .thenComposeAsync(__ -> this.tryGet())
                     .thenApply(buf -> {
+                        // if the bytebuf is null, clear the future; this makes it
+                        // possible to retry getting this chunk on the next attempt
                         if (buf == null) {
                             // can't cause deadlock as this is run asynchronously
                             synchronized (this) {
@@ -77,8 +84,8 @@ public final class ChunkCacheEntry {
                         }
                         return buf;
                     });
-            // mark the running future as valid; if chunk generation fails,
-            // it will be automatically marked as invalid after it's done
+            // save the future to return for later calls; this future will
+            // be cleared if getting the chunk fails (see above)
             this.future = future;
             return future;
         }
@@ -90,6 +97,9 @@ public final class ChunkCacheEntry {
             if (future != null) {
                 future.thenAccept(ReferenceCountUtil::release);
             }
+            // clear saved future and mark chunk as released
+            this.future = null;
+            this.released = true;
         }
     }
 }
