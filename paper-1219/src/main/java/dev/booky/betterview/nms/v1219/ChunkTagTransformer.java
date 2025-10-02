@@ -3,14 +3,11 @@ package dev.booky.betterview.nms.v1219;
 
 import ca.spottedleaf.moonrise.common.util.WorldUtil;
 import ca.spottedleaf.moonrise.patches.starlight.util.SaveUtil;
-import com.destroystokyo.paper.util.SneakyThrow;
 import com.mojang.serialization.Codec;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
-import dev.booky.betterview.nms.ReflectionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -28,8 +25,6 @@ import net.minecraft.world.level.chunk.storage.SerializableChunkData;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodType;
 import java.util.Optional;
 
 import static dev.booky.betterview.nms.v1219.ChunkWriter.SENDABLE_HEIGHTMAP_TYPES;
@@ -39,20 +34,7 @@ public final class ChunkTagTransformer {
 
     private static final long[][] EMPTY_LONG_2D_ARRAY = new long[0][];
 
-    private static final MethodHandle MAKE_BIOME_CODEC_RW = ReflectionUtil.getMethod(
-            SerializableChunkData.class, MethodType.methodType(Codec.class, Registry.class), 1);
-
     private ChunkTagTransformer() {
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Codec<PalettedContainer<Holder<Biome>>> makeBiomeCodecRW(Registry<Biome> registry) {
-        try {
-            return (Codec<PalettedContainer<Holder<Biome>>>) MAKE_BIOME_CODEC_RW.invoke(registry);
-        } catch (Throwable throwable) {
-            SneakyThrow.sneaky(throwable);
-            throw new AssertionError();
-        }
     }
 
     public static boolean isChunkLit(CompoundTag tag) {
