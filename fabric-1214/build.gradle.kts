@@ -17,7 +17,6 @@ dependencies {
 
     // adventure platform for better integration with everything
     modImplementation(libs.adventure.platform.fabric.v1214)
-    include(libs.adventure.platform.fabric.v1214)
 
     // depend on moonrise for chunk loading stuff
     modApi(libs.moonrise.v1214)

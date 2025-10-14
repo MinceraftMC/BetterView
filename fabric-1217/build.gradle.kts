@@ -4,13 +4,6 @@ plugins {
     alias(libs.plugins.loom)
 }
 
-repositories {
-    // adventure-platform-mod hasn't been released yet, use snapshot version
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-        mavenContent { snapshotsOnly() }
-    }
-}
-
 dependencies {
     minecraft(libs.minecraft.v1217)
     mappings(loom.layered {
@@ -24,7 +17,6 @@ dependencies {
 
     // adventure platform for better integration with everything
     modImplementation(libs.adventure.platform.fabric.v1217)
-    include(libs.adventure.platform.fabric.v1217)
 
     // depend on moonrise for chunk loading stuff
     modApi(libs.moonrise.v1217)

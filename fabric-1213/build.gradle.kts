@@ -17,7 +17,6 @@ dependencies {
 
     // adventure platform for better integration with everything
     modImplementation(libs.adventure.platform.fabric.v1213)
-    include(libs.adventure.platform.fabric.v1213)
 
     // update kyori option library as adventure platform includes a version too old for configurate to work
     include(libs.option)
