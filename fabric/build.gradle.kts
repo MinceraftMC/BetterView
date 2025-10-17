@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.loom)
 }
 
-val testTaskVersion = "1.21.7"
+val testTaskVersion = "1.21.9"
 val testTaskVersionFiltered = testTaskVersion.replace(".", "")
 
 // intermediary mappings are useless here
