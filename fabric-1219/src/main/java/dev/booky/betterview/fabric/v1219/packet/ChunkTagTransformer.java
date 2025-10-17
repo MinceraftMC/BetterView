@@ -8,22 +8,19 @@ import dev.booky.betterview.common.antixray.AntiXrayProcessor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.PalettedContainerFactory;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.chunk.storage.SerializableChunkData;
@@ -64,8 +61,9 @@ public final class ChunkTagTransformer {
             byte[][] blockLight,
             byte @Nullable [][] skyLight
     ) {
-        Registry<Biome> biomeRegistry = level.registryAccess().lookupOrThrow(Registries.BIOME);
-        Codec<PalettedContainerRO<Holder<Biome>>> biomeCodec = SerializableChunkData.makeBiomeCodec(biomeRegistry);
+        PalettedContainerFactory factory = level.palettedContainerFactory();
+        Codec<PalettedContainerRO<Holder<Biome>>> biomeCodec = factory.biomeContainerCodec();
+        Codec<PalettedContainer<BlockState>> blockCodec = factory.blockStatesContainerCodec();
 
         ListTag sectionTags = chunkTag.getListOrEmpty(SerializableChunkData.SECTIONS_TAG);
         int minLightSection = WorldUtil.getMinLightSection(level);
@@ -77,28 +75,15 @@ public final class ChunkTagTransformer {
             int sectionIndex = level.getSectionIndexFromSectionY(sectionY);
 
             if (sectionIndex >= 0 && sectionIndex < sections.length) {
-                PalettedContainer<BlockState> blocks;
-                if (sectionTag.get("block_states") instanceof CompoundTag blockStatesTag) {
-                    blocks = SerializableChunkData.BLOCK_STATE_CODEC
-                            .parse(NbtOps.INSTANCE, blockStatesTag).getOrThrow();
-                } else {
-                    blocks = new PalettedContainer<>(
-                            Block.BLOCK_STATE_REGISTRY,
-                            Blocks.AIR.defaultBlockState(),
-                            PalettedContainer.Strategy.SECTION_STATES
-                    );
-                }
+                Tag blockStatesTag = sectionTag.get("block_states");
+                PalettedContainer<BlockState> blocks = blockStatesTag instanceof CompoundTag
+                        ? blockCodec.parse(NbtOps.INSTANCE, blockStatesTag).getOrThrow()
+                        : factory.createForBlockStates();
 
-                PalettedContainerRO<Holder<Biome>> biomes;
-                if (sectionTag.get("biomes") instanceof CompoundTag biomesTag) {
-                    biomes = biomeCodec.parse(NbtOps.INSTANCE, biomesTag).getOrThrow();
-                } else {
-                    biomes = new PalettedContainer<>(
-                            biomeRegistry.asHolderIdMap(),
-                            biomeRegistry.getOrThrow(Biomes.PLAINS),
-                            PalettedContainer.Strategy.SECTION_BIOMES
-                    );
-                }
+                Tag biomesTag = sectionTag.get("biomes");
+                PalettedContainerRO<Holder<Biome>> biomes = biomesTag instanceof CompoundTag
+                        ? biomeCodec.parse(NbtOps.INSTANCE, biomesTag).getOrThrow()
+                        : factory.createForBiomes();
 
                 LevelChunkSection section = new LevelChunkSection(blocks, biomes);
                 sections[sectionIndex] = section;
