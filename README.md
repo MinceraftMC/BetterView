@@ -38,6 +38,9 @@ The screenshot below was taken at `0 2250 0` in the end dimension with a view di
 
 | Minecraft Version | Paper | Fabric |
 |-------------------|-------|--------|
+| 1.21.10           | ✅     | ✅      |
+| 1.21.9            | ✅     | ✅      |
+| 1.21.8            | ✅     | ✅      |
 | 1.21.7            | ✅     | ✅      |
 | 1.21.6            | ✅     | ✅      |
 | 1.21.5            | ✅     | ✅      |
