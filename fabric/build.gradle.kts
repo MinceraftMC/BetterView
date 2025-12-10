@@ -87,12 +87,14 @@ abstract class CustomServerProductionRunTask : ServerProductionRunTask {
 }
 
 tasks.register<CustomServerProductionRunTask>("prodServer") {
+    jvmArgs.add("-Dmixin.debug.export=true")
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 tasks.register<ClientProductionRunTask>("prodClient") {
+    jvmArgs.add("-Dmixin.debug.export=true")
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(21)
     }
