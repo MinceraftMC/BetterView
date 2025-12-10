@@ -23,8 +23,8 @@ import net.kyori.adventure.key.Key;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -59,7 +59,8 @@ import java.util.stream.Stream;
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     private ServerChunkCache chunkSource;
 
     @Unique
@@ -93,7 +94,7 @@ public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
     private static @Nullable AntiXrayProcessor createAntiXray(ServerLevel level, BvLevelConfig.AntiXrayConfig config) {
         // create replacement presets based on level type
         Function<Block, Integer> stateId = block -> Block.BLOCK_STATE_REGISTRY.getId(block.defaultBlockState());
-        ReplacementPresets levelPresets = switch (level.dimension().location().toString()) {
+        ReplacementPresets levelPresets = switch (level.dimension().identifier().toString()) {
             case "minecraft:the_nether" -> ReplacementPresets.createStatic(stateId.apply(Blocks.NETHERRACK));
             case "minecraft:the_end" -> ReplacementPresets.createStatic(stateId.apply(Blocks.END_STONE));
             default -> ReplacementPresets.createStaticZeroSplit(
@@ -101,7 +102,7 @@ public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
                     new int[]{stateId.apply(Blocks.DEEPSLATE)});
         };
         Function<Key, Stream<Integer>> stateListFn = key -> {
-            ResourceLocation blockKey = ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value());
+            Identifier blockKey = Identifier.fromNamespaceAndPath(key.namespace(), key.value());
             return BuiltInRegistries.BLOCK.get(blockKey)
                     .orElseThrow().value().getStateDefinition().getPossibleStates()
                     .stream().map(Block.BLOCK_STATE_REGISTRY::getIdOrThrow);
@@ -172,7 +173,7 @@ public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
     }
 
     public BvLevelConfig betterview$getConfig() {
-        return BetterViewMod.INSTANCE.getManager().getConfig(this.dimension().location());
+        return BetterViewMod.INSTANCE.getManager().getConfig(this.dimension().identifier());
     }
 
     public LoadingCache<McChunkPos, ChunkCacheEntry> betterview$getChunkCache() {
@@ -180,6 +181,6 @@ public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
     }
 
     public Key betterview$getName() {
-        return this.dimension().location();
+        return this.dimension().identifier();
     }
 }

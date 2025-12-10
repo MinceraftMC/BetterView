@@ -7,8 +7,8 @@ import dev.booky.betterview.common.hooks.LevelHook;
 import dev.booky.betterview.common.hooks.PlayerHook;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -55,7 +55,7 @@ public class BetterViewMod implements BetterViewHook, ModInitializer {
         // eagerly load all available dimensions once on startup to allow
         // population of config file - every other dimension gets lazy loaded
         for (ResourceKey<Level> levelKey : levelKeys) {
-            manager.getLevel(levelKey.location());
+            manager.getLevel(levelKey.identifier());
         }
         // call post-load action
         manager.onPostLoad();
@@ -81,7 +81,7 @@ public class BetterViewMod implements BetterViewHook, ModInitializer {
 
     @Override
     public LevelHook constructLevel(String worldName) {
-        ResourceKey<Level> levelKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(worldName));
+        ResourceKey<Level> levelKey = ResourceKey.create(Registries.DIMENSION, Identifier.parse(worldName));
         ServerLevel level = this.getServer().getLevel(levelKey);
         if (level == null) {
             throw new IllegalArgumentException("Can't find level with name " + worldName);

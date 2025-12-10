@@ -22,7 +22,8 @@ import java.util.Set;
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
 
-    @Final @Shadow
+    @Final
+    @Shadow
     protected LevelStorageSource.LevelStorageAccess storageSource;
 
     @Shadow
