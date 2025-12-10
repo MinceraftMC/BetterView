@@ -1,4 +1,4 @@
-package dev.booky.betterview.nms.v1219;
+package dev.booky.betterview.nms.v12111;
 // Created by booky10 in BetterView (16:37 03.06.2025)
 
 import ca.spottedleaf.concurrentutil.util.Priority;
@@ -25,7 +25,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -241,7 +241,7 @@ public class NmsAdapter implements PaperNmsInterface {
                     new int[]{stateId.apply(Blocks.DEEPSLATE)});
         };
         Function<Key, Stream<Integer>> stateListFn = key -> {
-            ResourceLocation blockKey = ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value());
+            Identifier blockKey = Identifier.fromNamespaceAndPath(key.namespace(), key.value());
             return BuiltInRegistries.BLOCK.get(blockKey)
                     .orElseThrow().value().getStateDefinition().getPossibleStates()
                     .stream().map(Block.BLOCK_STATE_REGISTRY::getIdOrThrow);

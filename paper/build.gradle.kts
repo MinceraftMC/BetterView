@@ -59,7 +59,7 @@ configure<BukkitPluginDescription> {
 }
 
 tasks.named<RunServer>("runServer") {
-    val version = "1.21.8"
+    val version = "1.21.11"
     minecraftVersion(version)
     runDirectory = runDirectory.get().dir(version)
 }

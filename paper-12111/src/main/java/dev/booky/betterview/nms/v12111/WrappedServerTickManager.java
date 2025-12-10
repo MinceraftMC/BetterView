@@ -1,4 +1,4 @@
-package dev.booky.betterview.nms.v1219;
+package dev.booky.betterview.nms.v12111;
 // Created by booky10 in BetterView (23:37 03.06.2025)
 
 import dev.booky.betterview.common.BetterViewManager;

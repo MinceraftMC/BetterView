@@ -1,4 +1,4 @@
-package dev.booky.betterview.nms.v1219;
+package dev.booky.betterview.nms.v12111;
 // Created by booky10 in BetterView (21:19 03.06.2025)
 
 import ca.spottedleaf.moonrise.common.util.WorldUtil;
@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
-import static dev.booky.betterview.nms.v1219.ChunkWriter.SENDABLE_HEIGHTMAP_TYPES;
+import static dev.booky.betterview.nms.v12111.ChunkWriter.SENDABLE_HEIGHTMAP_TYPES;
 
 @NullMarked
 public final class ChunkTagTransformer {

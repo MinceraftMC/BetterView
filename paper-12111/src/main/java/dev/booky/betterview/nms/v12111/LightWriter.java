@@ -1,12 +1,12 @@
-package dev.booky.betterview.nms.v1219;
+package dev.booky.betterview.nms.v12111;
 // Created by booky10 in BetterView (21:00 03.06.2025)
 
 import ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray;
 import com.destroystokyo.paper.util.SneakyThrow;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.Util;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.VarInt;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
