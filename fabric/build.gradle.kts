@@ -80,7 +80,7 @@ abstract class CustomServerProductionRunTask : ServerProductionRunTask {
     @Inject
     constructor() : super()
 
-    override fun configureProgramArgs(exec: ExecSpec?) {
+    override fun configureProgramArgs(exec: ExecSpec) {
         super.configureProgramArgs(exec)
         exec!!.standardInput = System.`in`
     }

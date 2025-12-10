@@ -2,7 +2,7 @@
 # plugins
 paperweight = "2.0.0-beta.19"
 shadow = "8.3.9"
-loom = "1.11-SNAPSHOT"
+loom = "1.14-SNAPSHOT"
 pluginyml = "0.6.0"
 runtask = "3.0.0"
 
@@ -57,7 +57,7 @@ adventure-platform-fabric-v1219 = "6.7.0"
 [plugins]
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
-loom = { id = "fabric-loom", version.ref = "loom" }
+loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }
 pluginyml-bukkit = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }
 runtask-paper = { id = "xyz.jpenilla.run-paper", version.ref = "runtask" }
 
