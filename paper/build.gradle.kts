@@ -56,6 +56,7 @@ configure<BukkitPluginDescription> {
     authors = listOf("booky10")
     website = "https://minceraft.dev/betterview"
     apiVersion = "1.21.1"
+    foliaSupported = true
 }
 
 tasks.named<RunServer>("runServer") {
