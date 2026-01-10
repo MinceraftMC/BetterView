@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  * This is a simple anti-xray, which would break under normal circumstances but
  * works for our use-case as we are only responsible for writing chunks far away.
  * <p>
- * This means we can just skip all the complex logic responsible for handling neighbouring
+ * This means we can just skip all the complex logic responsible for handling neighboring
  * chunks and checks whether a block is exposed to air/liquid or not and just replace
  * all unwanted blocks with another type of block.
  * <p>

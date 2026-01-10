@@ -22,11 +22,11 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -44,8 +44,8 @@ public final class BetterViewManager {
     private final AtomicInteger generatedChunks = new AtomicInteger(0);
     private final BetterViewHook hook;
 
-    private final Map<String, LevelHook> levels = new HashMap<>();
-    private final Map<UUID, PlayerHook> players = new HashMap<>();
+    private final Map<String, LevelHook> levels = new ConcurrentHashMap<>();
+    private final Map<UUID, PlayerHook> players = new ConcurrentHashMap<>();
 
     private final Path configPath;
     private BvConfig config;
@@ -53,8 +53,7 @@ public final class BetterViewManager {
     public BetterViewManager(Function<BetterViewManager, BetterViewHook> hookConstructor, Path configPath) {
         this.hook = hookConstructor.apply(this);
         this.configPath = configPath;
-        this.config = this.loadConfig();
-        this.saveConfig();
+        this.reloadConfig();
     }
 
     private BvConfig loadConfig() {
@@ -67,19 +66,27 @@ public final class BetterViewManager {
                 new TypeToken<BvConfig>() {}, this.config);
     }
 
-    public void onPostLoad() {
-        // reload config and populate dimensions
-        this.config = this.loadConfig();
-        for (LevelHook level : this.levels.values()) {
-            this.config.getLevelConfig(level.getName());
+    private void reloadConfig() {
+        synchronized (this.configPath) {
+            this.config = this.loadConfig();
+            // populate default dimensions
+            for (LevelHook level : this.levels.values()) {
+                this.config.getLevelConfig(level.getName());
+            }
+            this.saveConfig();
         }
-        this.saveConfig();
     }
 
-    // called on main thread
+    public void onPostLoad() {
+        // reload populate default dimensions after diensions are loaded
+        this.reloadConfig();
+    }
+
+    // called on global thread
     public void runTick() {
         BetterViewHook hook = this.hook;
-        if (!this.config.getGlobalConfig().isEnabled()) {
+        BvConfig config = this.getConfig();
+        if (!config.getGlobalConfig().isEnabled()) {
             return; // disabled globally
         }
 
@@ -111,7 +118,7 @@ public final class BetterViewManager {
             player.getNettyChannel().eventLoop().execute(() -> {
                 try {
                     long deadline = System.nanoTime() + maxTimePerPlayerNanos;
-                    this.tickPlayer(player, level, chunkPos, deadline);
+                    this.tickPlayer(player, level, chunkPos, config, deadline);
                 } catch (Throwable throwable) {
                     LOGGER.error("Error while ticking player {} in level {}", player, level, throwable);
                 }
@@ -119,7 +126,7 @@ public final class BetterViewManager {
         }
     }
 
-    private void tickPlayer(PlayerHook player, LevelHook level, McChunkPos chunkPos, long deadline) {
+    private void tickPlayer(PlayerHook player, LevelHook level, McChunkPos chunkPos, BvConfig config, long deadline) {
         BetterViewPlayer bv = player.getBvPlayer();
 
         // tick player movement
@@ -130,7 +137,7 @@ public final class BetterViewManager {
         }
 
         // start processing chunks (process at least once)
-        int chunksPerTick = this.config.getGlobalConfig().getChunkSendLimit();
+        int chunksPerTick = config.getGlobalConfig().getChunkSendLimit();
         int chunkQueueSize = level.getConfig().getChunkQueueSize();
         do {
             // check if any chunks are built and ready for sending
@@ -158,7 +165,7 @@ public final class BetterViewManager {
     }
 
     public boolean checkChunkGeneration() {
-        return this.generatedChunks.getAndIncrement() <= this.config.getGlobalConfig().getChunkGenerationLimit();
+        return this.generatedChunks.getAndIncrement() <= this.getConfig().getGlobalConfig().getChunkGenerationLimit();
     }
 
     public LevelHook getLevel(Key worldName) {
@@ -187,10 +194,12 @@ public final class BetterViewManager {
     }
 
     public BvLevelConfig getConfig(Key worldName) {
-        return this.config.getLevelConfig(worldName);
+        return this.getConfig().getLevelConfig(worldName);
     }
 
     public BvConfig getConfig() {
-        return this.config;
+        synchronized (this.configPath) {
+            return this.config;
+        }
     }
 }
