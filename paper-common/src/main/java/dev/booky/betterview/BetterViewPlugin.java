@@ -4,9 +4,9 @@ package dev.booky.betterview;
 import dev.booky.betterview.common.BetterViewManager;
 import dev.booky.betterview.listener.LevelListener;
 import dev.booky.betterview.listener.PlayerListener;
-import dev.booky.betterview.listener.TickListener;
 import dev.booky.betterview.nms.PaperNmsInterface;
 import dev.booky.betterview.platform.PaperBetterView;
+import net.kyori.adventure.util.Ticks;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -39,13 +39,17 @@ public class BetterViewPlugin extends JavaPlugin {
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(new LevelListener(this.manager), this);
         Bukkit.getPluginManager().registerEvents(new PlayerListener(this.manager), this);
-        Bukkit.getPluginManager().registerEvents(new TickListener(this.manager), this);
 
         // inject packet handling
         PaperNmsInterface.SERVICE.injectPacketHandler(this.manager, this.listenerKey);
 
         // run task after server has finished starting
-        Bukkit.getScheduler().runTask(this, this.manager::onPostLoad);
+        Bukkit.getGlobalRegionScheduler().run(this, __ -> this.manager.onPostLoad());
+
+        // start ticking after one fourth of a second so we know for sure our post-load has already happened
+        // this dynamically adjusts with the tickrate the server is set to and is not time-based
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, __ -> this.manager.runTick(),
+                Ticks.TICKS_PER_SECOND / 4, 1L);
     }
 
     @Override
