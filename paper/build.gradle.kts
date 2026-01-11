@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import xyz.jpenilla.runpaper.RunPaperExtension
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
@@ -59,8 +60,13 @@ configure<BukkitPluginDescription> {
     foliaSupported = true
 }
 
-tasks.named<RunServer>("runServer") {
-    val version = "1.21.11"
-    minecraftVersion(version)
-    runDirectory = runDirectory.get().dir(version)
+configure<RunPaperExtension> {
+    folia.registerTask()
+}
+
+val testVersion = "1.21.11"
+
+tasks.withType<RunServer> {
+    minecraftVersion(testVersion)
+    runDirectory = runDirectory.get().dir(testVersion)
 }
