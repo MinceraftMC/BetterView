@@ -1,11 +1,4 @@
 [versions]
-# plugins
-paperweight = "2.0.0-beta.19"
-shadow = "8.3.9"
-loom = "1.14-SNAPSHOT"
-pluginyml = "0.6.0"
-runtask = "3.0.0"
-
 # common
 slf4j = "2.0.17"
 jspecify = "1.0.0"
@@ -58,13 +51,6 @@ minecraft-v12111 = "1.21.11"
 parchment-v12111 = "2025.10.05"
 moonrise-v12111 = "RHK1oePc" # https://modrinth.com/mod/moonrise-opt/version/RHK1oePc
 adventure-platform-fabric-v12111 = "6.8.0"
-
-[plugins]
-paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
-loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }
-pluginyml-bukkit = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }
-runtask-paper = { id = "xyz.jpenilla.run-paper", version.ref = "runtask" }
 
 [libraries]
 # common

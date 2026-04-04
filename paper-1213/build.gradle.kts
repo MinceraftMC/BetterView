@@ -1,7 +1,7 @@
 import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 
 plugins {
-    alias(libs.plugins.paperweight.userdev)
+    io.papermc.paperweight.userdev
 }
 
 dependencies {

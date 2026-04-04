@@ -1,11 +1,3 @@
-plugins {
-    alias(libs.plugins.shadow) apply false
-    alias(libs.plugins.paperweight.userdev) apply false
-    alias(libs.plugins.loom) apply false
-    alias(libs.plugins.pluginyml.bukkit) apply false
-    alias(libs.plugins.runtask.paper) apply false
-}
-
 allprojects {
     group = "dev.booky.betterview"
     version = "2.1.3-SNAPSHOT"

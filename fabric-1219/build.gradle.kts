@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.AbstractRemapJarTask
 
 plugins {
-    alias(libs.plugins.loom)
+    net.fabricmc.`fabric-loom-remap`
 }
 
 dependencies {

@@ -4,7 +4,7 @@ import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import net.fabricmc.loom.task.prod.ServerProductionRunTask
 
 plugins {
-    alias(libs.plugins.loom)
+    net.fabricmc.`fabric-loom-remap`
 }
 
 val testTaskVersion = "1.21.11"

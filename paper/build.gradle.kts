@@ -4,9 +4,9 @@ import xyz.jpenilla.runpaper.RunPaperExtension
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
-    alias(libs.plugins.shadow)
-    alias(libs.plugins.pluginyml.bukkit)
-    alias(libs.plugins.runtask.paper)
+    com.gradleup.shadow
+    net.minecrell.`plugin-yml`.bukkit
+    xyz.jpenilla.`run-paper`
 }
 
 dependencies {
