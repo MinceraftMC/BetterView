@@ -8,9 +8,10 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.paperweight)
-    implementation(libs.shadow)
-    implementation(libs.loom)
-    implementation(libs.pluginyml)
-    implementation(libs.runtask)
+    implementation(gradleApi())
+    implementation(libs.plugin.paperweight)
+    implementation(libs.plugin.shadow)
+    implementation(libs.plugin.loom)
+    implementation(libs.plugin.pluginyml)
+    implementation(libs.plugin.runtask)
 }

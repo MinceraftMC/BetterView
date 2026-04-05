@@ -1,44 +1,14 @@
-import net.fabricmc.loom.task.AbstractRemapJarTask
+import dev.booky.betterview.gradle.BetterViewFabricExt
 
 plugins {
-    net.fabricmc.`fabric-loom-remap`
+    id("betterview.fabric-intermediary")
 }
 
 dependencies {
-    minecraft(libs.minecraft.v1211)
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment(variantOf(libs.parchment.v1211) { artifactType("zip") })
-    })
-    modImplementation(libs.fabric.loader)
-
-    // common project setup
-    api(projects.common) {
-        exclude(group = "net.kyori")
-    }
-
-    // adventure platform for better integration with everything
-    modImplementation(libs.adventure.platform.fabric.v1211)
-
     // update kyori option library as adventure platform includes a version too old for configurate to work
     include(libs.option)
-
-    // depend on moonrise for chunk loading stuff
-    modApi(libs.moonrise.v1211)
 }
 
-tasks.named<ProcessResources>("processResources") {
-    inputs.property("version", project.version)
-    filesMatching("fabric.mod.json") {
-        expand("version" to project.version)
-    }
-}
-
-tasks.withType<AbstractRemapJarTask> {
-    archiveBaseName = "${rootProject.name}-${project.name}".lowercase()
-}
-
-loom {
-    accessWidenerPath = file("src/main/resources/betterview.accesswidener")
-    mixin.defaultRefmapName = "${rootProject.name}-${project.name}-refmap.json".lowercase()
+configure<BetterViewFabricExt> {
+    versionName = "1.21.1"
 }
