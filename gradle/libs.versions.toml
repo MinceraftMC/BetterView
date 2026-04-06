@@ -1,10 +1,10 @@
 [versions]
 # plugins
-paperweight = "2.0.0-beta.19"
-shadow = "8.3.9"
+paperweight = "2.0.0-beta.21"
+shadow = "9.4.1"
 loom = "1.14-SNAPSHOT"
 pluginyml = "0.6.0"
-runtask = "3.0.0"
+runtask = "3.0.2"
 
 # common
 slf4j = "2.0.17"
@@ -24,6 +24,7 @@ paper-v1214 = "1.21.4-R0.1-SNAPSHOT"
 paper-v1215 = "1.21.5-R0.1-SNAPSHOT"
 paper-v1219 = "1.21.9-R0.1-SNAPSHOT"
 paper-v12111 = "1.21.11-R0.1-SNAPSHOT"
+paper-v2611 = "26.1.1.build.+"
 bstats = "3.1.0"
 
 # fabric

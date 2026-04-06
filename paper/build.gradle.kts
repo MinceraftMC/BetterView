@@ -35,6 +35,10 @@ tasks.withType<Jar> {
 
 tasks.withType<ShadowJar> {
     mergeServiceFiles()
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
     // final paper jar, place it in root build dir
     destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
     archiveClassifier = ""
@@ -44,10 +48,6 @@ tasks.withType<ShadowJar> {
     ).forEach { (key, value) ->
         relocate(key, "${project.group}.libs.$value")
     }
-}
-
-tasks.named("assemble") {
-    dependsOn(tasks.withType<ShadowJar>())
 }
 
 configure<BukkitPluginDescription> {

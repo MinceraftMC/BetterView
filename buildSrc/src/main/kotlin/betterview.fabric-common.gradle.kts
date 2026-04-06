@@ -5,7 +5,6 @@ import net.fabricmc.loom.task.AbstractRemapJarTask
 
 plugins {
     `java-library`
-    `maven-publish`
 }
 
 dependencies {
