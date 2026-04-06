@@ -56,12 +56,12 @@ public class NmsAdapter implements PaperNmsInterface {
     static final byte FORGET_LEVEL_CHUNK_PACKET_ID = 0x25;
     static final ByteBuf FORGET_LEVEL_CHUNK_PACKET_ID_BUF =
             Unpooled.wrappedBuffer(new byte[]{FORGET_LEVEL_CHUNK_PACKET_ID});
-    static final byte LEVEL_CHUNK_WITH_LIGHT_PACKET_ID = 0x2C;
+    static final byte LEVEL_CHUNK_WITH_LIGHT_PACKET_ID = 0x2D;
     static final ByteBuf LEVEL_CHUNK_WITH_LIGHT_PACKET_ID_BUF =
             Unpooled.wrappedBuffer(new byte[]{LEVEL_CHUNK_WITH_LIGHT_PACKET_ID});
 
     public NmsAdapter() {
-        if (SharedConstants.getProtocolVersion() != 774) {
+        if (SharedConstants.getProtocolVersion() != 775) {
             throw new UnsupportedOperationException();
         }
     }
@@ -79,7 +79,7 @@ public class NmsAdapter implements PaperNmsInterface {
     @Override
     public McChunkPos getChunkPos(Player player) {
         ChunkPos pos = ((CraftPlayer) player).getHandle().chunkPosition();
-        return new McChunkPos(pos.x, pos.z);
+        return new McChunkPos(pos.x(), pos.z());
     }
 
     @Override

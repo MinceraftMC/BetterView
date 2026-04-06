@@ -31,6 +31,8 @@ public final class ChunkWriter {
 
     private static final MethodHandle GET_NON_EMPTY_BLOCK_COUNT = ReflectionUtil.getGetter(
             LevelChunkSection.class, short.class, 0);
+    private static final MethodHandle GET_FLUID_COUNT = ReflectionUtil.getGetter(
+            LevelChunkSection.class, short.class, 1);
 
     private ChunkWriter() {
     }
@@ -172,6 +174,7 @@ public final class ChunkWriter {
     ) {
         try {
             buf.writeShort((short) GET_NON_EMPTY_BLOCK_COUNT.invoke(section));
+            buf.writeShort((short) GET_FLUID_COUNT.invoke(section));
         } catch (Throwable throwable) {
             SneakyThrow.sneaky(throwable);
         }

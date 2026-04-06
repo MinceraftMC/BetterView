@@ -51,7 +51,7 @@ public class PacketHandler extends ChannelOutboundHandlerAdapter {
                     case ClientboundForgetLevelChunkPacket packet -> {
                         // if the chunk is still in range, cancel the unload packet
                         ChunkPos chunkPos = packet.pos();
-                        return this.player.serverChunkRemove(chunkPos.x, chunkPos.z);
+                        return this.player.serverChunkRemove(chunkPos.x(), chunkPos.z());
                     }
                     case ClientboundLoginPacket __ -> this.player.handleDimensionReset(null);
                     case ClientboundStartConfigurationPacket __ -> this.player.handleDimensionReset(null);
