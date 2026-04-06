@@ -1,11 +1,11 @@
 // Created by booky10 in BetterView (6:21 PM 04.04.2026)
 
-import dev.booky.betterview.gradle.BetterViewFabricExt
+import dev.booky.betterview.gradle.BetterViewVersionExt
 
-val bvFabricExt = project.extensions.create<BetterViewFabricExt>("betterview")
+val betterviewExt = project.extensions.create<BetterViewVersionExt>("betterview")
 
 // we need to load stuff before fabric does, so this plugin
 // separates the extension properties from the actual config
 project.afterEvaluate {
-    bvFabricExt.afterEvaluate.forEach { it.run() }
+    betterviewExt.afterEvaluate.forEach { it.run() }
 }

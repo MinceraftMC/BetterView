@@ -1,21 +1,21 @@
-import dev.booky.betterview.gradle.BetterViewFabricExt
+import dev.booky.betterview.gradle.BetterViewVersionExt
 
 // Created by booky10 in BetterView (6:21 PM 04.04.2026)
 
 plugins {
-    id("betterview.fabric-ext")
+    id("betterview.version-ext")
     net.fabricmc.`fabric-loom-remap`
     id("betterview.fabric-common")
 }
 
-val bvFabricExt = project.extensions.getByType<BetterViewFabricExt>()
+val betterviewExt = project.extensions.getByType<BetterViewVersionExt>()
 
 dependencies {
-    bvFabricExt.afterEvaluate.add {
-        minecraft("com.mojang:minecraft:${bvFabricExt.versionName.get()}")
+    betterviewExt.afterEvaluate.add {
+        minecraft("com.mojang:minecraft:${betterviewExt.versionName.get()}")
 
         // depend on moonrise for chunk loading stuff
-        val depVersion = bvFabricExt.dependencyVersion().get()
+        val depVersion = betterviewExt.dependencyVersion().get()
         val moonriseVersion = libs.versions.hackGetVersion("moonrise.$depVersion")
         modApi("maven.modrinth:moonrise-opt:$moonriseVersion")
 

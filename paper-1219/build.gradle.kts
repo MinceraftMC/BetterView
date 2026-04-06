@@ -1,12 +1,9 @@
-import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
+import dev.booky.betterview.gradle.BetterViewVersionExt
 
 plugins {
-    io.papermc.paperweight.userdev
+    id("betterview.paper")
 }
 
-dependencies {
-    implementation(projects.paperCommon)
-    paperweight.paperDevBundle(libs.versions.paper.v1219)
+configure<BetterViewVersionExt> {
+    versionName = "1.21.9"
 }
-
-paperweight.reobfArtifactConfiguration = ReobfArtifactConfiguration.MOJANG_PRODUCTION

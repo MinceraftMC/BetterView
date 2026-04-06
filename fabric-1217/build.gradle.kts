@@ -1,9 +1,9 @@
-import dev.booky.betterview.gradle.BetterViewFabricExt
+import dev.booky.betterview.gradle.BetterViewVersionExt
 
 plugins {
     id("betterview.fabric-intermediary")
 }
 
-configure<BetterViewFabricExt> {
+configure<BetterViewVersionExt> {
     versionName = "1.21.7"
 }

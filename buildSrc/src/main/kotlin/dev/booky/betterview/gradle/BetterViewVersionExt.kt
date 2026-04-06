@@ -7,7 +7,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.property
 import org.jetbrains.annotations.ApiStatus
 
-abstract class BetterViewFabricExt(
+abstract class BetterViewVersionExt(
     objects: ObjectFactory,
 ) {
 
