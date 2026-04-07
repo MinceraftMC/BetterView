@@ -64,9 +64,13 @@ configure<RunPaperExtension> {
     folia.registerTask()
 }
 
-val testVersion = "1.21.11"
+val testVersion = "26.1.1"
+val testJavaVersion = 25
 
 tasks.withType<RunServer> {
     minecraftVersion(testVersion)
     runDirectory = runDirectory.get().dir(testVersion)
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(testJavaVersion)
+    }
 }

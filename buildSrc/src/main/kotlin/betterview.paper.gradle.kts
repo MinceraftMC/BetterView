@@ -13,10 +13,16 @@ val betterviewExt = project.extensions.getByType<BetterViewVersionExt>()
 
 dependencies {
     implementation(project(":paper-common"))
-    paperweight.paperDevBundle(betterviewExt.dependencyVersion()
-        .map { libs.versions.hackGetVersion("paper.$it") })
+    paperweight.paperDevBundle(
+        betterviewExt.dependencyVersion()
+            .map { libs.versions.hackGetVersion("paper.$it") })
 }
 
 configure<PaperweightUserExtension> {
     reobfArtifactConfiguration = ReobfArtifactConfiguration.MOJANG_PRODUCTION
+}
+
+// hack to allow depending on this platform in java 21 projects
+configurations.runtimeElements.configure {
+    attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
 }
