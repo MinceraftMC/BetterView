@@ -39,15 +39,23 @@ tasks.withType<ShadowJar> {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 
-    // final paper jar, place it in root build dir
-    destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
-    archiveClassifier = ""
     // relocate shaded dependencies
     mapOf(
         "org.bstats" to "bstats"
     ).forEach { (key, value) ->
         relocate(key, "${project.group}.libs.$value")
     }
+}
+
+val finalJar = tasks.register<Copy>("finalJar") {
+    from(tasks.named<ShadowJar>("shadowJar")) {
+        rename { it.replace("-all", "") }
+    }
+    destinationDir = rootProject.layout.buildDirectory.dir("libs").get().asFile
+}
+
+tasks.named("assemble") {
+    dependsOn(finalJar)
 }
 
 configure<BukkitPluginDescription> {

@@ -23,8 +23,8 @@ jobs:
           distribution: temurin
           cache: gradle
 
-      - name: Build project
-        run: ./gradlew build --no-daemon --parallel
+      - name: Build and publish project
+        run: ./gradlew build publish --no-daemon --parallel -PminceraftUsername=${{ secrets.PUBLISH_USERNAME }} -PminceraftPassword=${{ secrets.PUBLISH_PASSWORD }}
 
       - name: Upload project jars
         uses: actions/upload-artifact@v5
