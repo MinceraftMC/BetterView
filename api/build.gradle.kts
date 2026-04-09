@@ -10,3 +10,7 @@ tasks.named<ProcessResources>("processResources") {
         expand("version" to project.version)
     }
 }
+
+configure<JavaPluginExtension> {
+    withJavadocJar()
+}
