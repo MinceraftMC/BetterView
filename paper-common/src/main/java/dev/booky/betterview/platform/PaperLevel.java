@@ -43,6 +43,11 @@ public class PaperLevel implements LevelHook {
     }
 
     @Override
+    public BetterViewManager getManager() {
+        return this.manager;
+    }
+
+    @Override
     public CompletableFuture<@Nullable ByteBuf> getCachedChunkBuf(McChunkPos chunkPos) {
         return PaperNmsInterface.SERVICE.getLoadedChunkBuf(this.world, this.antiXray, chunkPos);
     }

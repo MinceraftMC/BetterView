@@ -1,4 +1,6 @@
 dependencies {
+    api(projects.api)
+
     // declare everything as compileOnly; if any platforms
     // require a specific dependency to be included, this should
     // be done in the specific platform subproject and not here

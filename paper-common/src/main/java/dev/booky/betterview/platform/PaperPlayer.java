@@ -11,7 +11,6 @@ import dev.booky.betterview.common.util.McChunkPos;
 import dev.booky.betterview.nms.PaperNmsInterface;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
@@ -80,5 +79,10 @@ public class PaperPlayer implements PlayerHook {
     @Override
     public boolean isValid() {
         return this.player.isConnected() && this.player.isValid();
+    }
+
+    @Override
+    public String toString() {
+        return this.player.toString();
     }
 }

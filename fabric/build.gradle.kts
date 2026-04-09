@@ -23,7 +23,8 @@ dependencies {
     // will just get cryptic error messages
     modImplementation(libs.fabric.loader)
 
-    // include common project once
+    // include common projects once
+    include(projects.api)
     include(projects.common)
 
     // include common dependencies

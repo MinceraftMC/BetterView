@@ -96,6 +96,81 @@ Make sure to adjust the cache duration based on what you use your server for;
 for e.g. static lobby servers, you can use a longer cache duration than for dynamic SMP servers.
 If the cache duration is too high, chunks will display outdated content after e.g. a rejoin.
 
+## API Usage
+
+Maven Repository: `https://repo.minceraft.dev/releases/` \
+Maven Artifact: `dev.booky.betterview:betterview-api:2.1.3-SNAPSHOT` \
+Javadoc: https://repo.minceraft.dev/javadoc/releases/dev/booky/betterview/betterview-api/2.1.3-SNAPSHOT
+
+<details>
+<summary><strong>Example for Paper</strong></summary>
+
+```java
+// get the BetterView API instance using Bukkit's ServicesManager
+// this is the only difference between using the API on paper and fabric
+BvManager bvManager = Bukkit.getServicesManager().load(BvManager.class);
+if (bvManager == null) {
+    throw new IllegalStateException("Failed to load BetterView API");
+}
+// invalidate chunk cache at 0 0 in the overworld
+BvLevel overworld = bvManager.getLevel(Key.key(Key.MINECRAFT_NAMESPACE, "overworld"));
+overworld.invalidateChunkCache(0, 0);
+// refresh the chunk for all players in the overworld
+for (BvPlayer player : overworld.getPlayers()) {
+    // (switch to proper thread for thread-safety)
+    player.getExecutor().execute(() -> {
+        if (!player.isActive()) {
+            // player isn't active - maybe they have switched
+            // dimensions in the short time it took for this code to run?
+            return;
+        }
+        // ensure BetterView actually "owns" the chunk at 0 0
+        if (player.getChunkLifecycle(0, 0).isOwned()) {
+            // finally, queue the chunk to be refreshed!
+            player.refreshChunk(0, 0);
+        }
+    });
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Example for Fabric</strong></summary>
+
+```java
+// get the BetterView API instance using fabric's object share
+// this is the only difference between using the API on paper and fabric
+BvManager bvManager = (BvManager) FabricLoader.getInstance().getObjectShare().get("betterview:api");
+if (bvManager == null) {
+    throw new IllegalStateException("Failed to load BetterView API");
+}
+// invalidate chunk cache at 0 0 in the overworld
+BvLevel overworld = bvManager.getLevel(Key.key(Key.MINECRAFT_NAMESPACE, "overworld"));
+overworld.invalidateChunkCache(0, 0);
+// refresh the chunk for all players in the overworld
+for (BvPlayer player : overworld.getPlayers()) {
+    // (switch to proper thread for thread-safety)
+    player.getExecutor().execute(() -> {
+        if (!player.isActive()) {
+            // player isn't active - maybe they have switched
+            // dimensions in the short time it took for this code to run?
+            return;
+        }
+        // ensure BetterView actually "owns" the chunk at 0 0
+        if (player.getChunkLifecycle(0, 0).isOwned()) {
+            // finally, queue the chunk to be refreshed!
+            player.refreshChunk(0, 0);
+        }
+    });
+}
+```
+
+</details>
+
+Please note that the API is still work in progress. Please be sure to post suggestions, enhancements or any other ideas
+on our [Discord](https://discord.gg/zC8xjtSPKC) or in the issue tracker.
+
 ## Building
 
 1. Clone the project (`git clone https://github.com/MinceraftMC/BetterView.git`)

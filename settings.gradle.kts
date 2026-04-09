@@ -6,7 +6,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include("common")
+include("api", "common")
 
 include("paper-common", "paper")
 sequenceOf("1.21.1", "1.21.3", "1.21.4", "1.21.5", "1.21.9", "1.21.11", "26.1")

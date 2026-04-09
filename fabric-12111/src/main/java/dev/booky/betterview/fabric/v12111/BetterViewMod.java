@@ -6,6 +6,7 @@ import dev.booky.betterview.common.hooks.BetterViewHook;
 import dev.booky.betterview.common.hooks.LevelHook;
 import dev.booky.betterview.common.hooks.PlayerHook;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -48,6 +49,7 @@ public class BetterViewMod implements BetterViewHook, ModInitializer {
         // initialize BV manager with config inside the root world directory
         Path configPath = worldDir.resolve("betterview.yml");
         this.manager = new BetterViewManager(__ -> this, configPath);
+        FabricLoader.getInstance().getObjectShare().put("betterview:api", this.manager.getApi());
     }
 
     public void triggerPostLoad(Set<ResourceKey<Level>> levelKeys) {

@@ -1,6 +1,7 @@
 package dev.booky.betterview;
 // Created by booky10 in BetterView (15:40 03.06.2025)
 
+import dev.booky.betterview.api.BvManager;
 import dev.booky.betterview.common.BetterViewManager;
 import dev.booky.betterview.listener.LevelListener;
 import dev.booky.betterview.listener.PlayerListener;
@@ -10,6 +11,7 @@ import net.kyori.adventure.util.Ticks;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
@@ -25,6 +27,7 @@ public class BetterViewPlugin extends JavaPlugin {
     public BetterViewPlugin() {
         Path configPath = this.getDataPath().resolve("config.yml");
         this.manager = new BetterViewManager(PaperBetterView::new, configPath);
+        Bukkit.getServicesManager().register(BvManager.class, this.manager.getApi(), this, ServicePriority.Normal);
     }
 
     @Override

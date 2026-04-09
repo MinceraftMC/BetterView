@@ -1,6 +1,9 @@
 package dev.booky.betterview.common;
 // Created by booky10 in BetterView (15:19 03.06.2025)
 
+import dev.booky.betterview.api.BvLevel;
+import dev.booky.betterview.api.BvManager;
+import dev.booky.betterview.api.BvPlayer;
 import dev.booky.betterview.common.BetterViewPlayer.ChunkQueueEntry;
 import dev.booky.betterview.common.config.BvConfig;
 import dev.booky.betterview.common.config.BvLevelConfig;
@@ -21,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -50,10 +54,32 @@ public final class BetterViewManager {
     private final Path configPath;
     private BvConfig config;
 
+    private final BvManager api = new BvManager() {
+        @Override
+        public boolean hasLevel(Key dimensionName) {
+            return BetterViewManager.this.levels.containsKey(dimensionName.asString());
+        }
+
+        @Override
+        public BvLevel getLevel(Key dimensionName) {
+            return BetterViewManager.this.getLevel(dimensionName);
+        }
+
+        @Override
+        public @Nullable BvPlayer getPlayerOrNull(UUID playerId) {
+            PlayerHook player = BetterViewManager.this.getPlayerOrNull(playerId);
+            return player != null ? player.getBvPlayer() : null;
+        }
+    };
+
     public BetterViewManager(Function<BetterViewManager, BetterViewHook> hookConstructor, Path configPath) {
         this.hook = hookConstructor.apply(this);
         this.configPath = configPath;
         this.reloadConfig();
+    }
+
+    public BvManager getApi() {
+        return this.api;
     }
 
     private BvConfig loadConfig() {
@@ -174,6 +200,10 @@ public final class BetterViewManager {
 
     public void unregisterLevel(Key worldName) {
         this.levels.remove(worldName.asString());
+    }
+
+    public Collection<PlayerHook> getPlayers() {
+        return this.players.values();
     }
 
     public @Nullable PlayerHook getPlayerOrNull(UUID playerId) {

@@ -1,5 +1,8 @@
 package dev.booky.betterview.common;
 
+import dev.booky.betterview.api.BvExecutor;
+import dev.booky.betterview.api.BvPlayer;
+import dev.booky.betterview.api.ChunkLifecycle;
 import dev.booky.betterview.common.hooks.LevelHook;
 import dev.booky.betterview.common.hooks.PlayerHook;
 import dev.booky.betterview.common.util.BetterViewUtil;
@@ -18,14 +21,14 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.booky.betterview.common.BetterViewPlayer.ChunkLifecycle.BV_LOADED;
-import static dev.booky.betterview.common.BetterViewPlayer.ChunkLifecycle.BV_QUEUED;
-import static dev.booky.betterview.common.BetterViewPlayer.ChunkLifecycle.SERVER_LOADED;
-import static dev.booky.betterview.common.BetterViewPlayer.ChunkLifecycle.UNLOADED;
+import static dev.booky.betterview.api.ChunkLifecycle.BV_LOADED;
+import static dev.booky.betterview.api.ChunkLifecycle.BV_QUEUED;
+import static dev.booky.betterview.api.ChunkLifecycle.SERVER_LOADED;
+import static dev.booky.betterview.api.ChunkLifecycle.UNLOADED;
 import static dev.booky.betterview.common.util.BetterViewUtil.MC_MAX_DIMENSION_SIZE_CHUNKS;
 
 @NullMarked
-public final class BetterViewPlayer {
+public final class BetterViewPlayer implements BvPlayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("BetterView");
 
@@ -59,6 +62,24 @@ public final class BetterViewPlayer {
 
     public boolean enabled = false;
     public boolean initiated = false;
+
+    private final BvExecutor executor = new BvExecutor() {
+        @Override
+        public boolean isSameThread() {
+            return BetterViewPlayer.this.player.getNettyChannel().eventLoop().inEventLoop();
+        }
+
+        @Override
+        public void execute(Runnable command) {
+            BetterViewPlayer.this.player.getNettyChannel().eventLoop().execute(() -> {
+                try {
+                    command.run();
+                } catch (Throwable throwable) {
+                    throw new IllegalStateException("Failed to run " + command + " in context of " + BetterViewPlayer.this.player, throwable);
+                }
+            });
+        }
+    };
 
     public BetterViewPlayer(PlayerHook player) {
         this.player = player;
@@ -431,11 +452,49 @@ public final class BetterViewPlayer {
         this.chunkQueue.clear();
     }
 
-    public enum ChunkLifecycle {
-        UNLOADED,
-        SERVER_LOADED,
-        BV_QUEUED,
-        BV_LOADED,
+    @Override
+    public BvExecutor getExecutor() {
+        return this.executor;
+    }
+
+    @Override
+    public boolean isActive() {
+        return this.enabled;
+    }
+
+    @Override
+    public LevelHook getLevel() {
+        return this.level;
+    }
+
+    @Override
+    public ChunkLifecycle getChunkLifecycle(int chunkX, int chunkZ) {
+        if (!this.canStore(chunkX, chunkZ)) {
+            return UNLOADED;
+        }
+        return this.chunkStates[calcIndex(chunkX, chunkZ, this.storageDiameter)].lifecycle;
+    }
+
+    @Override
+    public void refreshChunk(int chunkX, int chunkZ) throws IllegalStateException {
+        if (!this.canStore(chunkX, chunkZ)) {
+            throw new IllegalStateException("Chunk " + chunkX + ";" + chunkZ + " is out of bounds for " + this.chunkPos
+                    + " with diameter " + this.storageDiameter + " for " + this.player);
+        }
+        int chunkIndex = calcIndex(chunkX, chunkZ, this.storageDiameter);
+        ChunkState state = this.chunkStates[chunkIndex];
+        if (!state.lifecycle.isOwned()) {
+            throw new IllegalStateException("Chunk " + chunkX + ";" + chunkZ + " for "
+                    + this.player + " is not owned by BetterView");
+        }
+        // remove from queue to ensure a fully updated chunk will be sent
+        if (state.lifecycle == BV_QUEUED) {
+            this.purgeQueue(chunkX, chunkZ);
+        }
+        // mark as unloaded and reset iteration index - this ensures the
+        // chunk will be eventually refreshed, as long as we continuously tick this player
+        state.set(chunkX, chunkZ, UNLOADED);
+        this.iterationIndex = 0;
     }
 
     public static final class ChunkState {

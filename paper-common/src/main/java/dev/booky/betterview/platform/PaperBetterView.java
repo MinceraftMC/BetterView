@@ -39,7 +39,7 @@ public class PaperBetterView implements BetterViewHook {
     public LevelHook constructLevel(String worldName) {
         World world = Bukkit.getWorld(Key.key(worldName));
         if (world == null) {
-            throw new IllegalStateException("Can't find level with name " + worldName);
+            throw new IllegalArgumentException("Can't find level with name " + worldName);
         }
         return new PaperLevel(this.manager, world);
     }

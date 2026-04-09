@@ -10,6 +10,7 @@ runtask = "3.0.2"
 slf4j = "2.0.17"
 jspecify = "1.0.0"
 checker-qual = "3.49.3"
+jetbrains-annotations = "26.1.0"
 netty = "4.1.121.Final"
 caffeine = "3.2.0"
 configurate = "4.2.0"
@@ -58,12 +59,14 @@ plugin-runtask = { module = "xyz.jpenilla:run-task", version.ref = "runtask" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 checker-qual = { module = "org.checkerframework:checker-qual", version.ref = "checker-qual" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 netty-buffer = { module = "io.netty:netty-buffer", version.ref = "netty" }
 netty-transport = { module = "io.netty:netty-transport", version.ref = "netty" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 configurate-yaml = { module = "org.spongepowered:configurate-yaml", version.ref = "configurate" }
 fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventure-key = { module = "net.kyori:adventure-key", version.ref = "adventure" }
 
 # paper
 paper-api-base = { module = "io.papermc.paper:paper-api", version.ref = "paper-base" }

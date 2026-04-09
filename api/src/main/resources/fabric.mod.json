@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "betterview-api",
+  "version": "${version}",
+  "name": "BetterView API",
+
+  "icon": "assets/betterview/icon.png",
+  "description": "API logic for extending the normal server view distance without sacrificing server performance",
+  "authors": [
+    "booky10"
+  ],
+
+  "license": "GPL-3.0-only",
+  "environment": "*",
+
+  "depends": {
+    "java": ">=21"
+  },
+
+  "custom": {
+    "modmenu": {
+      "parent": "betterview"
+    }
+  }
+}

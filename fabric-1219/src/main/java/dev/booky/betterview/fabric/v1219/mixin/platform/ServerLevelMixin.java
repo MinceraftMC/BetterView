@@ -6,6 +6,7 @@ import ca.spottedleaf.moonrise.libs.ca.spottedleaf.concurrentutil.util.Priority;
 import ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel;
 import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import dev.booky.betterview.common.BetterViewManager;
 import dev.booky.betterview.common.ChunkCacheEntry;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
 import dev.booky.betterview.common.antixray.ReplacementPresets;
@@ -19,7 +20,6 @@ import dev.booky.betterview.fabric.v1219.packet.ChunkTagTransformer;
 import dev.booky.betterview.fabric.v1219.packet.ChunkWriter;
 import dev.booky.betterview.fabric.v1219.packet.PacketUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -60,7 +60,8 @@ import java.util.stream.Stream;
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     private ServerChunkCache chunkSource;
 
     @Unique
@@ -109,6 +110,10 @@ public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
         };
         // create processor based on config
         return AntiXrayProcessor.createProcessor(config, levelPresets, stateListFn, Block.BLOCK_STATE_REGISTRY.size());
+    }
+
+    public BetterViewManager betterview$getManager() {
+        return BetterViewMod.INSTANCE.getManager();
     }
 
     public CompletableFuture<@Nullable ByteBuf> betterview$getCachedChunkBuf(McChunkPos chunkPos) {
