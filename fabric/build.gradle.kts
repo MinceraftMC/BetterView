@@ -1,27 +1,19 @@
 import net.fabricmc.loom.task.AbstractRemapJarTask
-import net.fabricmc.loom.task.RemapJarTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import net.fabricmc.loom.task.prod.ServerProductionRunTask
 
 plugins {
-    net.fabricmc.`fabric-loom-remap`
+    net.fabricmc.`fabric-loom`
 }
 
 val testTaskVersion = "1.21.11"
 val testTaskVersionFiltered = testTaskVersion.replace(".", "")
 
-// intermediary mappings are useless here
-loom.noIntermediateMappings()
-
 val includeAll: Configuration by configurations.creating
 
 dependencies {
-    // dummy fabric env setup
-    minecraft("com.mojang:minecraft:$testTaskVersion")
-    mappings(loom.officialMojangMappings())
-    // required for production run tasks, otherwise we
-    // will just get cryptic error messages
-    modImplementation(libs.fabric.loader)
+    // dummy fabric env setup (use non-obfuscated version for less prep time)
+    minecraft("com.mojang:minecraft:26.1.2")
 
     // include common projects once
     include(projects.api)
@@ -55,7 +47,7 @@ tasks.named<ProcessResources>("processResources") {
     }
 }
 
-tasks.named<RemapJarTask>("remapJar") {
+tasks.named<Jar>("jar") {
     // include common dependencies transitively
     fun doInclude(dep: ResolvedDependency) {
         configurations.named("include").get().withDependencies {
@@ -91,6 +83,8 @@ abstract class CustomServerProductionRunTask : ServerProductionRunTask {
 
 tasks.register<CustomServerProductionRunTask>("prodServer") {
     jvmArgs.add("-Dmixin.debug.export=true")
+    minecraftVersion = testTaskVersion
+    loaderVersion = libs.versions.fabric.loader.get()
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(21)
     }

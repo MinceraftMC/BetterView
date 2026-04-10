@@ -2,7 +2,7 @@
 # plugins
 paperweight = "2.0.0-beta.21"
 shadow = "9.4.1"
-loom = "1.14-SNAPSHOT"
+loom = "1.16-SNAPSHOT"
 pluginyml = "0.6.0"
 runtask = "3.0.2"
 
