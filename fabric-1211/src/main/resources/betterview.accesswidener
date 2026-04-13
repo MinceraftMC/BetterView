@@ -5,8 +5,13 @@ accessible field net/minecraft/server/network/ServerCommonPacketListenerImpl con
 accessible field net/minecraft/network/Connection channel Lio/netty/channel/Channel;
 accessible field net/minecraft/world/level/chunk/storage/ChunkSerializer BLOCK_STATE_CODEC Lcom/mojang/serialization/Codec;
 accessible field net/minecraft/world/level/chunk/LevelChunkSection nonEmptyBlockCount S
+accessible field net/minecraft/world/level/lighting/LightEngine storage Lnet/minecraft/world/level/lighting/LayerLightSectionStorage;
+accessible field net/minecraft/server/level/ServerChunkCache mainThreadProcessor Lnet/minecraft/server/level/ServerChunkCache$MainThreadExecutor;
+accessible field net/minecraft/world/level/chunk/PalettedContainer data Lnet/minecraft/world/level/chunk/PalettedContainer$Data;
 
 # Methods
 accessible method net/minecraft/world/level/chunk/storage/ChunkSerializer makeBiomeCodec (Lnet/minecraft/core/Registry;)Lcom/mojang/serialization/Codec;
+accessible method net/minecraft/server/level/ServerChunkCache getVisibleChunkIfPresent (J)Lnet/minecraft/server/level/ChunkHolder;
+accessible method net/minecraft/server/level/ChunkMap getPlayerViewDistance (Lnet/minecraft/server/level/ServerPlayer;)I
 
 # Classes

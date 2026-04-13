@@ -9,6 +9,7 @@
   },
   "mixins": [
     "accessor.SWMRNibbleArrayAccessor",
+    "listener.ChunkMapMixin",
     "listener.ConnectionMixin",
     "listener.MinecraftServerMixin",
     "listener.PlayerListMixin",

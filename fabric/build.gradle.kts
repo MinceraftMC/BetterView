@@ -6,7 +6,7 @@ plugins {
     net.fabricmc.`fabric-loom`
 }
 
-val testTaskVersion = "1.21.11"
+val testTaskVersion = "1.21.1"
 val testTaskVersionFiltered = testTaskVersion.replace(".", "")
 
 val includeAll: Configuration by configurations.creating
@@ -85,6 +85,7 @@ tasks.register<CustomServerProductionRunTask>("prodServer") {
     jvmArgs.add("-Dmixin.debug.export=true")
     minecraftVersion = testTaskVersion
     loaderVersion = libs.versions.fabric.loader.get()
+    runDir = project.layout.projectDirectory.dir("run/${testTaskVersion}")
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(21)
     }
@@ -92,6 +93,7 @@ tasks.register<CustomServerProductionRunTask>("prodServer") {
 
 tasks.register<ClientProductionRunTask>("prodClient") {
     jvmArgs.add("-Dmixin.debug.export=true")
+    runDir = project.layout.projectDirectory.dir("run/${testTaskVersion}")
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(21)
     }
