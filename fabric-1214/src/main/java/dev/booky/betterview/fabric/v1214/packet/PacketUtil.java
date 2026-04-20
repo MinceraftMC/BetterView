@@ -1,7 +1,6 @@
 package dev.booky.betterview.fabric.v1214.packet;
 // Created by booky10 in BetterView (04:08 05.06.2025)
 
-import ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -40,10 +39,9 @@ public class PacketUtil {
         ByteBuf buf = Unpooled.buffer();
         try {
             CompoundTag heightmapsTag = ChunkWriter.extractHeightmapsTag(chunk);
-            byte[][] blockLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getBlockNibbles(), false);
-            byte[][] skyLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getSkyNibbles(), true);
+            byte[][] emptyLight = new byte[MoonriseUtil.getTotalLightSections(level)][];
             ChunkWriter.writeFullBody(buf, antiXray, level.getMinSectionY(),
-                    heightmapsTag, chunk.getSections(), blockLight, skyLight);
+                    heightmapsTag, chunk.getSections(), emptyLight, null);
             return buf.retain();
         } finally {
             buf.release();
