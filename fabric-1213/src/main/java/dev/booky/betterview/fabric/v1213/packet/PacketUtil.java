@@ -40,10 +40,9 @@ public class PacketUtil {
         ByteBuf buf = Unpooled.buffer();
         try {
             CompoundTag heightmapsTag = ChunkWriter.extractHeightmapsTag(chunk);
-            byte[][] blockLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getBlockNibbles(), false);
-            byte[][] skyLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getSkyNibbles(), true);
+            byte[][] emptyLight = new byte[MoonriseUtil.getTotalLightSections(level)][];
             ChunkWriter.writeFullBody(buf, antiXray, level.getMinSectionY(),
-                    heightmapsTag, chunk.getSections(), blockLight, skyLight);
+                    heightmapsTag, chunk.getSections(), emptyLight, null);
             return buf.retain();
         } finally {
             buf.release();

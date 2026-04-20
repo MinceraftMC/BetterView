@@ -4,8 +4,14 @@ package dev.booky.betterview.fabric.v1213.packet;
 import ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray;
 import dev.booky.betterview.fabric.v1213.mixin.accessor.SWMRNibbleArrayAccessor;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.core.SectionPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.VarInt;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.DataLayer;
+import net.minecraft.world.level.lighting.LayerLightEventListener;
+import net.minecraft.world.level.lighting.LightEngine;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -18,6 +24,37 @@ import java.util.List;
 public final class LightWriter {
 
     private LightWriter() {
+    }
+
+    @Contract("_, _, _, false -> !null")
+    public static byte @Nullable [][] convertLightToBytes(ServerLevel level, LayerLightEventListener layer, ChunkPos pos, boolean allowEmpty) {
+        int layerCount = MoonriseUtil.getTotalLightSections(level);
+        byte[][] layers = new byte[layerCount][];
+        if (layer == LayerLightEventListener.DummyLightLayerEventListener.INSTANCE) {
+            return !allowEmpty ? layers : null;
+        }
+        boolean nonEmpty = false;
+        // fast path if this is a vanilla engine (prevents allocating
+        // SectionPos by directly accessing the underlying storage)
+        if (layer instanceof LightEngine<?, ?> engine) {
+            long sectionPosBase = ((pos.x & 0x3FFFFFL) << (64 - 22)) | ((pos.z & 0x3FFFFFL) << (64 - 22 - 22));
+            for (int i = 0; i < layerCount; i++) {
+                DataLayer data = engine.storage.getDataLayerData(sectionPosBase | (i & 0xFFFFFL));
+                if (data != null) {
+                    layers[i] = data.getData();
+                    nonEmpty = true;
+                }
+            }
+        } else {
+            for (int i = 0; i < layerCount; i++) {
+                DataLayer data = layer.getDataLayerData(SectionPos.of(pos, i));
+                if (data != null) {
+                    layers[i] = data.getData();
+                    nonEmpty = true;
+                }
+            }
+        }
+        return nonEmpty || !allowEmpty ? layers : null;
     }
 
     @Contract("_, false -> !null")

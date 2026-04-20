@@ -1,4 +1,4 @@
-package dev.booky.betterview.fabric.v1211.packet;
+package dev.booky.betterview.fabric.v1213.packet;
 // Created by booky10 in BetterView (4:58 PM 10.04.2026)
 
 import ca.spottedleaf.moonrise.common.util.ChunkSystem;
@@ -46,7 +46,7 @@ public final class MoonriseUtil {
     }
 
     public static int getTotalLightSections(ServerLevel level) {
-        return level.getMaxSection() - level.getMinSection() + 3;
+        return level.getMaxSectionY() - level.getMinSectionY() + 3;
     }
 
     public static CompletableFuture<@Nullable ChunkAccess> getLoadedChunk(ServerLevel level, McChunkPos chunkPos) {

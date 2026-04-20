@@ -1,10 +1,6 @@
 package dev.booky.betterview.fabric.v1213.mixin.platform;
 // Created by booky10 in BetterView (04:24 05.06.2025)
 
-import ca.spottedleaf.moonrise.common.util.ChunkSystem;
-import ca.spottedleaf.moonrise.libs.ca.spottedleaf.concurrentutil.util.Priority;
-import ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel;
-import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import dev.booky.betterview.common.BetterViewManager;
 import dev.booky.betterview.common.ChunkCacheEntry;
@@ -18,6 +14,7 @@ import dev.booky.betterview.common.util.McChunkPos;
 import dev.booky.betterview.fabric.v1213.BetterViewMod;
 import dev.booky.betterview.fabric.v1213.packet.ChunkTagTransformer;
 import dev.booky.betterview.fabric.v1213.packet.ChunkWriter;
+import dev.booky.betterview.fabric.v1213.packet.MoonriseUtil;
 import dev.booky.betterview.fabric.v1213.packet.PacketUtil;
 import io.netty.buffer.ByteBuf;
 import net.kyori.adventure.key.Key;
@@ -33,8 +30,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.WritableLevelData;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -117,15 +112,12 @@ public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
     }
 
     public CompletableFuture<@Nullable ByteBuf> betterview$getCachedChunkBuf(McChunkPos chunkPos) {
-        NewChunkHolder holder = ((ChunkSystemServerLevel) this).moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(chunkPos.getKey());
-        if (holder == null) {
-            return CompletableFuture.completedFuture(null);
-        }
-        ChunkAccess access = holder.getChunkIfPresent(ChunkStatus.LIGHT);
-        if (access == null) {
-            return CompletableFuture.completedFuture(null);
-        }
-        return CompletableFuture.supplyAsync(() -> ChunkWriter.writeFullOrEmpty(access, this.antiXray));
+        return MoonriseUtil.getLoadedChunk((ServerLevel) (Object) this, chunkPos).thenApplyAsync(chunk -> {
+            if (chunk != null) {
+                return ChunkWriter.writeFullOrEmpty((ServerLevel) (Object) this, chunk, this.antiXray);
+            }
+            return null;
+        });
     }
 
     public CompletableFuture<@Nullable ChunkTagResult> betterview$readChunk(McChunkPos chunkPos) {
@@ -143,11 +135,8 @@ public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
     }
 
     public CompletableFuture<ByteBuf> betterview$loadChunk(int chunkX, int chunkZ) {
-        CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-        ChunkSystem.scheduleChunkLoad((ServerLevel) (Object) this, chunkX, chunkZ, true,
-                ChunkStatus.LIGHT, true, Priority.LOW,
-                chunk -> future.completeAsync(() -> ChunkWriter.writeFullOrEmpty(chunk, this.antiXray)));
-        return future;
+        return MoonriseUtil.getGeneratedChunk((ServerLevel) (Object) this, chunkX, chunkZ)
+                .thenApplyAsync(chunk -> ChunkWriter.writeFullOrEmpty((ServerLevel) (Object) this, chunk, this.antiXray));
     }
 
     public boolean betterview$checkChunkGeneration() {

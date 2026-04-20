@@ -41,7 +41,7 @@ public final class ChunkTagTransformer {
 
     public static boolean isChunkLit(CompoundTag tag) {
         ChunkStatus status = ChunkStatus.byName(tag.getString("Status"));
-        if (!status.isOrAfter(MoonriseUtil.INSTALLED ? ChunkStatus.LIGHT : ChunkStatus.FULL)) {
+        if (!status.isOrAfter(MoonriseUtil.TARGET_STATUS)) {
             return false; // not lit yet
         } else if (tag.get(ChunkSerializer.IS_LIGHT_ON_TAG) == null) {
             return false; // light isn't activated
