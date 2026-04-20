@@ -25,7 +25,7 @@ paper-v1214 = "1.21.4-R0.1-SNAPSHOT"
 paper-v1215 = "1.21.5-R0.1-SNAPSHOT"
 paper-v1219 = "1.21.9-R0.1-SNAPSHOT"
 paper-v12111 = "1.21.11-R0.1-SNAPSHOT"
-paper-v2611 = "26.1.1.build.+"
+paper-v2612 = "26.1.2.build.+"
 bstats = "3.1.0"
 
 # fabric
@@ -46,6 +46,8 @@ moonrise-v1219 = "phZzgzrM" # https://modrinth.com/mod/moonrise-opt/version/phZz
 adventure-platform-fabric-v1219 = "6.7.0"
 moonrise-v12111 = "RHK1oePc" # https://modrinth.com/mod/moonrise-opt/version/RHK1oePc
 adventure-platform-fabric-v12111 = "6.8.0"
+moonrise-v2612 = "G0OgMSn1" # https://modrinth.com/mod/moonrise-opt/version/G0OgMSn1
+adventure-platform-fabric-v2612 = "6.9.0"
 
 [libraries]
 # plugins

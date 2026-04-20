@@ -1,7 +1,7 @@
 import dev.booky.betterview.gradle.BetterViewVersionExt
 
 plugins {
-    id("betterview.paper")
+    id("betterview.fabric-official")
 }
 
 configure<BetterViewVersionExt> {
