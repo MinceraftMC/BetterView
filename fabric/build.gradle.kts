@@ -6,7 +6,7 @@ plugins {
     net.fabricmc.`fabric-loom`
 }
 
-val testTaskVersion = "1.21.1"
+val testTaskVersion = "1.21.11"
 val testTaskVersionFiltered = testTaskVersion.replace(".", "")
 
 val includeAll: Configuration by configurations.creating
