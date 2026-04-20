@@ -37,7 +37,7 @@ public final class LightWriter {
         // fast path if this is a vanilla engine (prevents allocating
         // SectionPos by directly accessing the underlying storage)
         if (layer instanceof LightEngine<?, ?> engine) {
-            long sectionPosBase = ((pos.x & 0x3FFFFFL) << (64 - 22)) | ((pos.z & 0x3FFFFFL) << (64 - 22 - 22));
+            long sectionPosBase = ((pos.x() & 0x3FFFFFL) << (64 - 22)) | ((pos.z() & 0x3FFFFFL) << (64 - 22 - 22));
             for (int i = 0; i < layerCount; i++) {
                 DataLayer data = engine.storage.getDataLayerData(sectionPosBase | (i & 0xFFFFFL));
                 if (data != null) {

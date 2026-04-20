@@ -136,7 +136,7 @@ public final class ChunkTagTransformer {
         long[] @Nullable [] heightmapsData = extractHeightmapsData(chunkTag);
         // delegate to chunk writing method
         return ChunkWriter.writeFull(
-                pos.x, pos.z, antiXray, level.getMinSectionY(),
+                pos.x(), pos.z(), antiXray, level.getMinSectionY(),
                 heightmapsData, sections, blockLight, skyLight
         );
     }

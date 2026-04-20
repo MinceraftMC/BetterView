@@ -68,7 +68,7 @@ public final class MoonriseUtil {
     public static CompletableFuture<ChunkAccess> getGeneratedChunk(ServerLevel level, int chunkX, int chunkZ) {
         if (!INSTALLED) {
             synchronized (GENERATION_QUEUE) {
-                return GENERATION_QUEUE.computeIfAbsent(ChunkPos.asLong(chunkX, chunkZ),
+                return GENERATION_QUEUE.computeIfAbsent(ChunkPos.pack(chunkX, chunkZ),
                         __ -> new CompletableFuture<>());
             }
         }

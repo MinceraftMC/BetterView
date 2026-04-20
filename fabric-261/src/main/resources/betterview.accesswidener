@@ -10,6 +10,7 @@ accessible field net/minecraft/server/level/ServerChunkCache mainThreadProcessor
 accessible field net/minecraft/server/level/ServerChunkCache distanceManager Lnet/minecraft/server/level/DistanceManager;
 accessible field net/minecraft/world/level/chunk/PalettedContainer strategy Lnet/minecraft/world/level/chunk/Strategy;
 accessible field net/minecraft/server/level/ServerChunkCache ticketStorage Lnet/minecraft/world/level/TicketStorage;
+accessible field net/minecraft/world/level/chunk/LevelChunkSection fluidCount S
 
 # Methods
 accessible method net/minecraft/server/level/ServerChunkCache getVisibleChunkIfPresent (J)Lnet/minecraft/server/level/ChunkHolder;

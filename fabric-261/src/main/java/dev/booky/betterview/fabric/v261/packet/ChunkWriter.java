@@ -77,7 +77,7 @@ public final class ChunkWriter {
         }
         // delegate to chunk writing method
         ChunkPos chunkPos = chunk.getPos();
-        return writeFull(chunk.getPos().x, chunkPos.z, antiXray, chunk.getMinSectionY(),
+        return writeFull(chunkPos.x(), chunkPos.z(), antiXray, chunk.getMinSectionY(),
                 heightmapsData, chunk.getSections(), blockLight, skyLight);
     }
 
@@ -174,6 +174,7 @@ public final class ChunkWriter {
             AntiXrayProcessor antiXray, int sectionY
     ) {
         buf.writeShort(section.nonEmptyBlockCount);
+        buf.writeShort(section.fluidCount);
 
         int preReaderIndex = buf.readerIndex();
         int preWriterIndex = buf.writerIndex();

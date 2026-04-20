@@ -29,7 +29,7 @@ paper-v2612 = "26.1.2.build.+"
 bstats = "3.1.0"
 
 # fabric
-fabric-loader = "0.16.14"
+fabric-loader = "0.19.2"
 option = "1.1.0" # minimum version required for configurate
 moonrise-v1211 = "gS0UE969" # https://modrinth.com/mod/moonrise-opt/version/gS0UE969
 adventure-platform-fabric-v1211 = "5.14.1"

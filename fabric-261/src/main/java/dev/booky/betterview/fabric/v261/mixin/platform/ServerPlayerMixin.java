@@ -73,7 +73,7 @@ public abstract class ServerPlayerMixin extends Player {
 
     public McChunkPos betterview$getChunkPos() {
         ChunkPos pos = this.chunkPosition();
-        return new McChunkPos(pos.x, pos.z);
+        return new McChunkPos(pos.x(), pos.z());
     }
 
     public int betterview$getSendViewDistance() {
