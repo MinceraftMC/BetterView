@@ -10,8 +10,6 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 
 import java.time.Duration;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @NullMarked
 @ConfigSerializable
@@ -20,6 +18,7 @@ public class BvConfig {
     public static final TypeSerializerCollection SERIALIZERS = TypeSerializerCollection.builder()
             .register(Duration.class, DurationSerializer.INSTANCE)
             .register(Key.class, KeySerializer.INSTANCE)
+            .register(DimensionsConfig.class, DimensionsConfig.SERIALIZER)
             .build();
 
     @Comment("The current configuration version, do not touch!")
@@ -28,7 +27,7 @@ public class BvConfig {
             + "use a value of -1 to prevent replacing the render distance of the integrated server")
     private int integratedServerRenderDistance = -1;
     private BvGlobalConfig global = new BvGlobalConfig();
-    private Map<Key, BvLevelConfig> dimensions = new LinkedHashMap<>();
+    private DimensionsConfig dimensions = new DimensionsConfig();
 
     public int getConfigVersion() {
         return this.configVersion;
@@ -42,7 +41,7 @@ public class BvConfig {
         return this.global;
     }
 
-    public BvLevelConfig getLevelConfig(Key worldName) {
-        return this.dimensions.computeIfAbsent(worldName, __ -> new BvLevelConfig());
+    public DimensionsConfig getDimensions() {
+        return this.dimensions;
     }
 }

@@ -95,10 +95,6 @@ public final class BetterViewManager {
     private void reloadConfig() {
         synchronized (this.configPath) {
             this.config = this.loadConfig();
-            // populate default dimensions
-            for (LevelHook level : this.levels.values()) {
-                this.config.getLevelConfig(level.getName());
-            }
             this.saveConfig();
         }
     }
@@ -224,7 +220,7 @@ public final class BetterViewManager {
     }
 
     public BvLevelConfig getConfig(Key worldName) {
-        return this.getConfig().getLevelConfig(worldName);
+        return this.getConfig().getDimensions().get(worldName);
     }
 
     public BvConfig getConfig() {
