@@ -9,10 +9,12 @@
   },
   "mixins": [
     "accessor.SWMRNibbleArrayAccessor",
+    "listener.ChunkMapMixin",
     "listener.ConnectionMixin",
     "listener.MinecraftServerMixin",
     "listener.PlayerListMixin",
     "listener.RegionizedPlayerChunkLoaderMixin",
+    "listener.ServerChunkCacheMixin",
     "platform.ServerLevelMixin",
     "platform.ServerPlayerMixin"
   ],

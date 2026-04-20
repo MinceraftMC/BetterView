@@ -1,7 +1,6 @@
 package dev.booky.betterview.fabric.v1215.mixin.platform;
 // Created by booky10 in BetterView (04:00 05.06.2025)
 
-import ca.spottedleaf.moonrise.common.PlatformHooks;
 import com.mojang.authlib.GameProfile;
 import dev.booky.betterview.common.BetterViewPlayer;
 import dev.booky.betterview.common.hooks.LevelHook;
@@ -9,10 +8,10 @@ import dev.booky.betterview.common.hooks.PlayerHook;
 import dev.booky.betterview.common.util.BetterViewUtil;
 import dev.booky.betterview.common.util.BypassedPacket;
 import dev.booky.betterview.common.util.McChunkPos;
+import dev.booky.betterview.fabric.v1215.packet.MoonriseUtil;
 import dev.booky.betterview.fabric.v1215.packet.PacketUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
@@ -83,7 +82,7 @@ public abstract class ServerPlayerMixin extends Player {
     }
 
     public int betterview$getSendViewDistance() {
-        return PlatformHooks.get().getSendViewDistance((ServerPlayer) (Object) this);
+        return MoonriseUtil.getSendViewDistance((ServerPlayer) (Object) this);
     }
 
     public int betterview$getRequestedViewDistance() {

@@ -36,8 +36,10 @@
       "1.21.7"
     ],
     "java": ">=21",
-    "moonrise": "*",
     "betterview-common": "*"
+  },
+  "suggests": {
+    "moonrise": "*"
   },
 
   "custom": {

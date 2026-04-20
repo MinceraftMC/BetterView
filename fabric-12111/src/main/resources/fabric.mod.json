@@ -35,8 +35,10 @@
       "1.21.11"
     ],
     "java": ">=21",
-    "moonrise": "*",
     "betterview-common": "*"
+  },
+  "suggests": {
+    "moonrise": "*"
   },
 
   "custom": {

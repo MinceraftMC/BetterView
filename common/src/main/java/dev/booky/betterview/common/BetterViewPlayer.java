@@ -61,7 +61,7 @@ public final class BetterViewPlayer implements BvPlayer {
     public int storageDiameter;
 
     public boolean enabled = false;
-    public boolean initiated = false;
+    public volatile boolean initiated = false;
 
     private final BvExecutor executor = new BvExecutor() {
         @Override
@@ -113,7 +113,7 @@ public final class BetterViewPlayer implements BvPlayer {
         return this.getServerViewDistance() < clientDistance;
     }
 
-    public void tryTriggerStart() {
+    public synchronized void tryTriggerStart() {
         if (!this.initiated) {
             // reset chunk position as it may be invalid when this instance has been created
             this.chunkPos = this.player.getChunkPos();

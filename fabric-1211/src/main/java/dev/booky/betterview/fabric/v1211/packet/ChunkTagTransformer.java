@@ -1,7 +1,6 @@
 package dev.booky.betterview.fabric.v1211.packet;
 // Created by booky10 in BetterView (21:19 03.06.2025)
 
-import ca.spottedleaf.moonrise.common.util.WorldUtil;
 import ca.spottedleaf.moonrise.patches.starlight.util.SaveUtil;
 import com.mojang.serialization.Codec;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
@@ -42,10 +41,13 @@ public final class ChunkTagTransformer {
 
     public static boolean isChunkLit(CompoundTag tag) {
         ChunkStatus status = ChunkStatus.byName(tag.getString("Status"));
-        if (!status.isOrAfter(ChunkStatus.LIGHT)) {
+        if (!status.isOrAfter(MoonriseUtil.TARGET_STATUS)) {
             return false; // not lit yet
         } else if (tag.get(ChunkSerializer.IS_LIGHT_ON_TAG) == null) {
             return false; // light isn't activated
+        }
+        if (!MoonriseUtil.INSTALLED) {
+            return true; // vanilla light
         }
         // check whether starlight version matches
         int lightVersion = tag.getInt(STARLIGHT_VERSION_TAG);
@@ -62,7 +64,7 @@ public final class ChunkTagTransformer {
         Codec<PalettedContainerRO<Holder<Biome>>> biomeCodec = ChunkSerializer.makeBiomeCodec(biomeRegistry);
 
         ListTag sectionTags = chunkTag.getList(ChunkSerializer.SECTIONS_TAG, Tag.TAG_COMPOUND);
-        int minLightSection = WorldUtil.getMinLightSection(level);
+        int minLightSection = level.getMinSection() - 1;
 
         boolean onlyAir = true;
         for (int i = 0; i < sectionTags.size(); ++i) {
@@ -138,7 +140,7 @@ public final class ChunkTagTransformer {
     ) {
         // extract relevant chunk data
         LevelChunkSection[] sections = new LevelChunkSection[level.getSectionsCount()];
-        byte[][] blockLight = new byte[WorldUtil.getTotalLightSections(level)][];
+        byte[][] blockLight = new byte[MoonriseUtil.getTotalLightSections(level)][];
         byte[][] skyLight = level.dimensionType().hasSkyLight() ? new byte[blockLight.length][] : null;
         boolean onlyAir = extractChunkData(level, chunkTag, sections, blockLight, skyLight);
         if (onlyAir) {

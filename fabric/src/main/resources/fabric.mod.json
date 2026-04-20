@@ -34,7 +34,9 @@
       "1.21.11"
     ],
     "java": ">=21",
-    "moonrise": "*",
     "adventure-platform-fabric": "*"
+  },
+  "suggests": {
+    "moonrise": "*"
   }
 }

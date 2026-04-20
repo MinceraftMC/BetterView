@@ -5,14 +5,18 @@ import ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
 import dev.booky.betterview.common.util.BetterViewUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import net.minecraft.core.Holder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.VarInt;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -55,14 +59,21 @@ public final class ChunkWriter {
         return heightmapsData;
     }
 
-    public static ByteBuf writeFullOrEmpty(ChunkAccess chunk, @Nullable AntiXrayProcessor antiXray) {
+    public static ByteBuf writeFullOrEmpty(ServerLevel level, ChunkAccess chunk, @Nullable AntiXrayProcessor antiXray) {
         if (isEmpty(chunk)) {
             return Unpooled.EMPTY_BUFFER;
         }
         long[] @Nullable [] heightmapsData = extractHeightmapsData(chunk);
         // convert lighting data
-        byte[][] blockLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getBlockNibbles(), false);
-        byte[][] skyLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getSkyNibbles(), true);
+        byte[][] blockLight;
+        byte[][] skyLight;
+        if (MoonriseUtil.INSTALLED) {
+            blockLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getBlockNibbles(), false);
+            skyLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getSkyNibbles(), true);
+        } else {
+            blockLight = LightWriter.convertLightToBytes(level, level.getLightEngine().getLayerListener(LightLayer.BLOCK), chunk.getPos(), false);
+            skyLight = LightWriter.convertLightToBytes(level, level.getLightEngine().getLayerListener(LightLayer.SKY), chunk.getPos(), true);
+        }
         // delegate to chunk writing method
         ChunkPos chunkPos = chunk.getPos();
         return writeFull(chunk.getPos().x, chunkPos.z, antiXray, chunk.getMinSectionY(),
@@ -165,7 +176,7 @@ public final class ChunkWriter {
 
         int preReaderIndex = buf.readerIndex();
         int preWriterIndex = buf.writerIndex();
-        section.getStates().write(buf);
+        section.getStates().data.write(buf);
         // move to before states are written for anti-xray to be able to read the states
         buf.readerIndex(preWriterIndex);
         // run anti-xray processing
@@ -173,6 +184,6 @@ public final class ChunkWriter {
         // reset reader index
         buf.readerIndex(preReaderIndex);
 
-        section.getBiomes().write(buf);
+        ((PalettedContainer<Holder<Biome>>) section.getBiomes()).data.write(buf);
     }
 }
