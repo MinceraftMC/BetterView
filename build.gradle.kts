@@ -59,3 +59,7 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
+tasks.register("printVersion") {
+    println(project.version.toString())
+}
