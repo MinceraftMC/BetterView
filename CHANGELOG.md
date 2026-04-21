@@ -1,3 +1,17 @@
+# v2.2.0
+
+## What's Changed
+
+- Add default dimension config ([#16](https://github.com/MinceraftMC/BetterView/issues/16), [`81b9e7a`](https://github.com/MinceraftMC/BetterView/commit/81b9e7ad3850bcc641b2fb1c8d18e80f0678cf72))
+- Add support for Paper 26.1.x ([`80c8000...a851089`](https://github.com/MinceraftMC/BetterView/compare/80c800051205f17cf5c6bbe45fb066f0d87c62f1...a85108951f20b6ccc25f255ec0b666c9123172ea))
+- Add support for Fabric 26.1.x ([`b0d3f31...88976f9`](https://github.com/MinceraftMC/BetterView/compare/b0d3f31885cb7a96c1f9191263781506fd27fa16...88976f9362c96768aca17be0bc1b30f9ae8af559))
+- Don't require Moonrise on Fabric ([`b059812...b0d3f31`](https://github.com/MinceraftMC/BetterView/compare/b059812170dcf668521cb87bf0f6237569280df8...b0d3f31885cb7a96c1f9191263781506fd27fa16))
+- Add a stable API ([#15](https://github.com/MinceraftMC/BetterView/issues/15), [`507e4a7...d8eb95e`](https://github.com/MinceraftMC/BetterView/compare/507e4a731c8a64e6922fba308b444cf8b64de5be...d8eb95e1b334acaa1102675618677228e17b23b7))
+  - See project description for more details
+- Add support for Folia ([#12](https://github.com/MinceraftMC/BetterView/issues/12), [`361405e...ad1075c`](https://github.com/MinceraftMC/BetterView/compare/361405e358daca8306c19a758d1bca89a403ffbb...ad1075cbfc922f5093cc886ca241530bcc5e82ff))
+
+**Full Changelog**: [`v2.1.2...v2.2.0`](https://github.com/MinceraftMC/BetterView/compare/v2.1.2...v2.2.0)
+
 # v2.1.2
 
 ## What's Changed
