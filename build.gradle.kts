@@ -1,6 +1,6 @@
 allprojects {
     group = "dev.booky.betterview"
-    version = "2.1.3-SNAPSHOT"
+    version = "2.2.0-SNAPSHOT"
 }
 
 subprojects {
