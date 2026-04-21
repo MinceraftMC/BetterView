@@ -5,6 +5,7 @@ shadow = "9.4.1"
 loom = "1.16-SNAPSHOT"
 pluginyml = "0.6.0"
 runtask = "3.0.2"
+modpublish = "1.1.0"
 
 # common
 slf4j = "2.0.17"
@@ -56,6 +57,7 @@ plugin-shadow = { module = "com.gradleup.shadow:shadow-gradle-plugin", version.r
 plugin-loom = { module = "net.fabricmc:fabric-loom", version.ref = "loom" }
 plugin-pluginyml = { module = "net.minecrell:plugin-yml", version.ref = "pluginyml" }
 plugin-runtask = { module = "xyz.jpenilla:run-task", version.ref = "runtask" }
+plugin-modpublish = { module = "me.modmuss50:mod-publish-plugin", version.ref = "modpublish" }
 
 # common
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }

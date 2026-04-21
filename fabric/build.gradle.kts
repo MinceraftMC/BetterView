@@ -4,6 +4,7 @@ import net.fabricmc.loom.task.prod.ServerProductionRunTask
 
 plugins {
     net.fabricmc.`fabric-loom`
+    id("betterview.publishing")
 }
 
 val testTaskVersion = "26.1.2"

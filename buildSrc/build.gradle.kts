@@ -14,4 +14,5 @@ dependencies {
     implementation(libs.plugin.loom)
     implementation(libs.plugin.pluginyml)
     implementation(libs.plugin.runtask)
+    implementation(libs.plugin.modpublish)
 }

@@ -7,6 +7,7 @@ plugins {
     com.gradleup.shadow
     net.minecrell.`plugin-yml`.bukkit
     xyz.jpenilla.`run-paper`
+    id("betterview.publishing")
 }
 
 dependencies {
