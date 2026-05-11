@@ -10,8 +10,8 @@ import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
@@ -34,7 +34,7 @@ public final class DimensionsConfig {
                 if (FALLBACK_KEY.equals(dimensionName)) {
                     continue; // not a dimension
                 }
-                ConfigurationNode mergedNode = child.getValue().mergeFrom(fallbackNode);
+                ConfigurationNode mergedNode = child.getValue().copy().mergeFrom(fallbackNode);
                 BvLevelConfig config = mergedNode.get(BvLevelConfig.class, (Supplier<BvLevelConfig>) BvLevelConfig::new);
                 configs.put(Key.key(dimensionName), config);
             }
@@ -50,10 +50,10 @@ public final class DimensionsConfig {
             }
 
             // minimize lock time by copying
-            Set<Map.Entry<Key, BvLevelConfig>> configEntries;
+            List<Map.Entry<Key, BvLevelConfig>> configEntries;
             obj.configsLock.readLock().lock();
             try {
-                configEntries = Set.copyOf(obj.configs.entrySet());
+                configEntries = List.copyOf(obj.configs.entrySet());
             } finally {
                 obj.configsLock.readLock().unlock();
             }
@@ -96,7 +96,7 @@ public final class DimensionsConfig {
         // "slow" path
         this.configsLock.writeLock().lock();
         try {
-            return this.configs.computeIfAbsent(dimension, __ -> new BvLevelConfig());
+            return this.configs.computeIfAbsent(dimension, __ -> this.fallback);
         } finally {
             this.configsLock.writeLock().unlock();
         }
