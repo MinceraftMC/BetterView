@@ -36,6 +36,7 @@ subprojects {
         options.compilerArgs.add("-Xlint:unchecked")
         options.compilerArgs.add("-Xlint:deprecation")
         options.compilerArgs.add("-Xlint:removal")
+        options.compilerArgs.add("--enable-preview")
     }
 
     tasks.withType<Jar> {
