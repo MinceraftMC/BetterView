@@ -35,9 +35,7 @@
       "~26.1"
     ],
     "java": ">=21",
-    "adventure-platform-fabric": "*"
-  },
-  "suggests": {
+    "adventure-platform-fabric": "*",
     "moonrise": "*"
   }
 }
