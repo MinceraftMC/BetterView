@@ -61,7 +61,8 @@ public class NmsAdapter implements PaperNmsInterface {
             Unpooled.wrappedBuffer(new byte[]{LEVEL_CHUNK_WITH_LIGHT_PACKET_ID});
 
     public NmsAdapter() {
-        if (SharedConstants.getProtocolVersion() != 775) {
+        if (SharedConstants.getProtocolVersion() != 775
+                && SharedConstants.getProtocolVersion() != 776) {
             throw new UnsupportedOperationException();
         }
     }
@@ -135,7 +136,7 @@ public class NmsAdapter implements PaperNmsInterface {
     public CompletableFuture<@Nullable ChunkTagResult> readChunkTag(World world, @Nullable AntiXrayProcessor antiXray, McChunkPos chunkPos) {
         ServerLevel level = ((CraftWorld) world).getHandle();
         ChunkPos nmsPos = new ChunkPos(chunkPos.getX(), chunkPos.getZ());
-        return level.chunkSource.chunkMap.read(nmsPos).thenApplyAsync(tag -> {
+        return level.getChunkSource().chunkMap.read(nmsPos).thenApplyAsync(tag -> {
             if (tag.isEmpty()) {
                 return null;
             } else if (!ChunkTagTransformer.isChunkLit(tag.get())) {
@@ -158,7 +159,7 @@ public class NmsAdapter implements PaperNmsInterface {
     @Override
     public boolean checkVoidWorld(World world) {
         ServerLevel level = ((CraftWorld) world).getHandle();
-        if (level.chunkSource.getGenerator() instanceof FlatLevelSource flat) {
+        if (level.getChunkSource().getGenerator() instanceof FlatLevelSource flat) {
             return flat.settings().getLayers().stream()
                     .noneMatch(state -> state != null && !state.isAir());
         }

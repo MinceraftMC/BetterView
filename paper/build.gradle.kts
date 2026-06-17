@@ -73,7 +73,7 @@ configure<RunPaperExtension> {
     folia.registerTask()
 }
 
-val testVersion = "26.1.1"
+val testVersion = "26.2"
 val testJavaVersion = 25
 
 tasks.withType<RunServer> {

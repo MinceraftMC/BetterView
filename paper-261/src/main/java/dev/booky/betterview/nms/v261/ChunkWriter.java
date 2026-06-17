@@ -145,7 +145,7 @@ public final class ChunkWriter {
                 serializedSize += section.getSerializedSize();
                 if (SharedConstants.getProtocolVersion() == 770) {
                     // fix https://bugs.mojang.com/browse/MC-296121
-                    serializedSize -= VarInt.getByteSize(section.states.data.storage().getRaw().length)
+                    serializedSize -= VarInt.getByteSize(section.getStates().data.storage().getRaw().length)
                             + VarInt.getByteSize(((PalettedContainer<?>) section.getBiomes()).data.storage().getRaw().length);
                 }
             }
@@ -181,7 +181,7 @@ public final class ChunkWriter {
 
         int preReaderIndex = buf.readerIndex();
         int preWriterIndex = buf.writerIndex();
-        section.states.write(buf, null, 0);
+        section.getStates().write(buf, null, 0);
         // move to before states are written for anti-xray to be able to read the states
         buf.readerIndex(preWriterIndex);
         // run anti-xray processing

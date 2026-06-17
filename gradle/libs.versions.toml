@@ -27,6 +27,7 @@ paper-v1215 = "1.21.5-R0.1-SNAPSHOT"
 paper-v1219 = "1.21.9-R0.1-SNAPSHOT"
 paper-v12111 = "1.21.11-R0.1-SNAPSHOT"
 paper-v2612 = "26.1.2.build.+"
+paper-v262 = "26.2.build.+"
 bstats = "3.1.0"
 
 # fabric
