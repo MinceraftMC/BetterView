@@ -151,7 +151,7 @@ public class NmsAdapter implements PaperNmsInterface {
     public CompletableFuture<ByteBuf> loadChunk(World world, @Nullable AntiXrayProcessor antiXray, int chunkX, int chunkZ) {
         CompletableFuture<ByteBuf> future = new CompletableFuture<>();
         ServerLevel level = ((CraftWorld) world).getHandle();
-        ChunkSystem.scheduleChunkLoad(level, chunkX, chunkZ, true, ChunkStatus.LIGHT, true, PrioritisedExecutor.Priority.LOW,
+        ChunkSystem.scheduleChunkLoad(level, chunkX, chunkZ, true, ChunkStatus.FULL, true, PrioritisedExecutor.Priority.LOW,
                 chunk -> future.completeAsync(() -> ChunkWriter.writeFullOrEmpty(chunk, antiXray)));
         return future;
     }

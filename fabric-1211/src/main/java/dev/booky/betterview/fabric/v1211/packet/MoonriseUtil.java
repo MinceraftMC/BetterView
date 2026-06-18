@@ -61,7 +61,7 @@ public final class MoonriseUtil {
         if (holder == null) {
             return CompletableFuture.completedFuture(null);
         }
-        return CompletableFuture.completedFuture(holder.getChunkIfPresent(ChunkStatus.LIGHT));
+        return CompletableFuture.completedFuture(holder.getChunkIfPresent(TARGET_STATUS));
     }
 
     public static CompletableFuture<ChunkAccess> getGeneratedChunk(ServerLevel level, int chunkX, int chunkZ) {
@@ -73,7 +73,7 @@ public final class MoonriseUtil {
         }
         CompletableFuture<ChunkAccess> future = new CompletableFuture<>();
         ChunkSystem.scheduleChunkLoad(level, chunkX, chunkZ, true,
-                ChunkStatus.LIGHT, true, Priority.LOW,
+                ChunkStatus.FULL, true, Priority.LOW,
                 future::complete);
         return future;
     }
