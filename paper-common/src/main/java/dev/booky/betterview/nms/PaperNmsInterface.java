@@ -39,6 +39,8 @@ public interface PaperNmsInterface {
 
     Object constructClientboundSetChunkCacheRadiusPacket(int distance);
 
+    Object constructClientboundPingPacket(int pingId);
+
     ByteBuf getClientboundForgetLevelChunkPacketId();
 
     ByteBuf getClientboundLevelChunkWithLightPacketId();

@@ -1,7 +1,7 @@
 dependencies {
-    compileOnly(libs.jspecify)
-    compileOnly(libs.jetbrains.annotations)
-    compileOnly(libs.adventure.key)
+    compileOnlyApi(libs.jspecify)
+    compileOnlyApi(libs.jetbrains.annotations)
+    compileOnlyApi(libs.adventure.key)
 }
 
 tasks.named<ProcessResources>("processResources") {

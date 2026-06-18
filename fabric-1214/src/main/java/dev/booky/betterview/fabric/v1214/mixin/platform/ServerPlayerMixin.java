@@ -14,6 +14,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.channel.Channel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -101,6 +102,10 @@ public abstract class ServerPlayerMixin extends Player {
                 .addComponent(true, packetId)
                 .addComponent(true, chunkPos);
         ((PlayerHook) this).getNettyChannel().write(new BypassedPacket(packetBuf));
+    }
+
+    public void betterview$sendPing(int pingId) {
+        ((PlayerHook) this).getNettyChannel().write(new ClientboundPingPacket(pingId));
     }
 
     public Channel betterview$getNettyChannel() {

@@ -25,6 +25,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -106,6 +107,11 @@ public class NmsAdapter implements PaperNmsInterface {
     @Override
     public Object constructClientboundSetChunkCacheRadiusPacket(int distance) {
         return new ClientboundSetChunkCacheRadiusPacket(distance);
+    }
+
+    @Override
+    public Object constructClientboundPingPacket(int pingId) {
+        return new ClientboundPingPacket(pingId);
     }
 
     @Override

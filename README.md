@@ -71,30 +71,41 @@ On the first start, this plugin will automatically create a configuration file. 
     - `chunk-generation-limit`: How many new chunks can be generated globally in one tick (default: `3`)
     - `chunk-send-limit`: The maximum amount of chunks sent to a player in a tick (default: `3`)
 - `dimensions`:
-    - `<dimension>` (e.g. `minecraft:overworld`):
+    - `<dimension>` (e.g. `minecraft:overworld` or `defaults` for default values):
         - `enabled`: Whether to enable or disable the plugin/mod for this dimension (default: `true`)
         - `chunk-generation-limit`: How many new chunks can be generated for this level in one tick (default: `2`)
         - `chunk-queue-size`: How many chunks can be queued per player at once (default: `16`)
         - `view-distance`: The maximum extended view distance for this dimension (default: `32`)
         - `cache-duration`: The cache duration for how long extended chunks should be kept in memory (default: `PT5M`,
           5 minutes)
+            - Make sure to adjust the cache duration based on what you use your server for;
+              for e.g. static lobby servers, you can use a longer cache duration than for dynamic SMP servers.
+              If the cache duration is too high, chunks will display outdated content after e.g. a rejoin.
         - `anti-xray`:
+            - Be aware that this plugin implements a lightweight version of anti-xray, which
+              doesn't check if a block is exposed to air or not. This means that every engine-mode other than `HIDE`
+              will probably not look very good.
             - `enabled`: Whether anti-xray will be enabled or disabled in this world (default: `false`)
             - `engine-mode`: Engine modes of anti-xray, either `HIDE`, `OBFUSCATE`, or `OBFUSCATE_LAYER`
               (default: `HIDE`)
             - `hidden-blocks`: The list of blocks to hide/obfuscate (default: all ores and
               all base blocks of dimensions)
+        - `chunk-batches`:
+            - Chunk batches are used to ensure the client/internet of players doesn't get overwhelmed by
+              too many chunks being sent at once. If enabled, BetterView sends a chunk batch and waits
+              for the player to acknowledge they received the full chunk batch. Only then the next batch of chunks
+              will be sent. \
+              A side effect of this will be that players with good connectivity but high latency
+              will receive chunks at a much slower rate than possible. \
+              *Note: chunk batches may be sent across multiple ticks.*
+            - `enabled`: Whether chunk batches are enabled or disabled in this dimension (default: `true`)
+            - `chunks-per-batch`: The amount of chunks in a single batch (default: `12`)
+            - `prepare-chunks-while-waiting`: Whether BetterView should continue preparing chunks while waiting for acknowledgement of previous batch (default: `true`)
+            - `batch-timeout`: The amount of time without a chunk being sent after which a batch expires (default: `PT5S`)
+            - `batch-wait-timeout`: The timeout after which BetterView automatically marks the batch as done, even without a player response (default: `PT30S`)
 
 Feel free to play around with the chunk generations and chunk sending limits for
 an optimal experience on your server setup.
-
-When using anti-xray, be aware that this plugin implements a lightweight version of anti-xray, which
-doesn't check if a block is exposed to air or not. This means that every engine-mode other than `HIDE`
-will probably not look very good.
-
-Make sure to adjust the cache duration based on what you use your server for;
-for e.g. static lobby servers, you can use a longer cache duration than for dynamic SMP servers.
-If the cache duration is too high, chunks will display outdated content after e.g. a rejoin.
 
 ## API Usage
 
@@ -119,8 +130,8 @@ overworld.invalidateChunkCache(0, 0);
 for (BvPlayer player : overworld.getPlayers()) {
     // (switch to proper thread for thread-safety)
     player.getExecutor().execute(() -> {
-        if (!player.isActive()) {
-            // player isn't active - maybe they have switched
+        if (!player.isActive() || player.getLevel() != overworld) {
+            // player isn't active or isn't in overworld - maybe they have switched
             // dimensions in the short time it took for this code to run?
             return;
         }
@@ -152,8 +163,8 @@ overworld.invalidateChunkCache(0, 0);
 for (BvPlayer player : overworld.getPlayers()) {
     // (switch to proper thread for thread-safety)
     player.getExecutor().execute(() -> {
-        if (!player.isActive()) {
-            // player isn't active - maybe they have switched
+        if (!player.isActive() || player.getLevel() != overworld) {
+            // player isn't active or isn't in overworld - maybe they have switched
             // dimensions in the short time it took for this code to run?
             return;
         }

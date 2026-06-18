@@ -3,9 +3,10 @@ package dev.booky.betterview.fabric.v1217.packet;
 
 import dev.booky.betterview.common.BetterViewPlayer;
 import dev.booky.betterview.common.util.BypassedPacket;
+import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import net.minecraft.network.protocol.common.ServerboundPongPacket;
 import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
@@ -19,11 +20,18 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public class PacketHandler extends ChannelOutboundHandlerAdapter {
+public class PacketHandler extends ChannelDuplexHandler {
 
     public static final String HANDLER_NAME = "betterview_handler";
 
     private @Nullable BetterViewPlayer player;
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (!this.handle(msg)) {
+            super.channelRead(ctx, msg);
+        }
+    }
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
@@ -45,7 +53,8 @@ public class PacketHandler extends ChannelOutboundHandlerAdapter {
                 || input instanceof ClientboundLoginPacket
                 || input instanceof ClientboundStartConfigurationPacket
                 || input instanceof ClientboundRespawnPacket
-                || input instanceof ClientboundSetChunkCacheRadiusPacket) {
+                || input instanceof ClientboundSetChunkCacheRadiusPacket
+                || input instanceof ServerboundPongPacket) {
             if (this.player != null && this.player.enabled) {
                 switch (input) {
                     case ClientboundLevelChunkWithLightPacket packet ->
@@ -63,6 +72,9 @@ public class PacketHandler extends ChannelOutboundHandlerAdapter {
                     }
                     case ClientboundSetChunkCacheRadiusPacket __ -> {
                         return true; // always cancel if enabled
+                    }
+                    case ServerboundPongPacket packet -> {
+                        return this.player.handleBatchPong(packet.getId());
                     }
                     default -> {
                         // NO-OP

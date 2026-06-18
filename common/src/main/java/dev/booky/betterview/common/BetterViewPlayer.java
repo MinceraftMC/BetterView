@@ -3,6 +3,7 @@ package dev.booky.betterview.common;
 import dev.booky.betterview.api.BvExecutor;
 import dev.booky.betterview.api.BvPlayer;
 import dev.booky.betterview.api.ChunkLifecycle;
+import dev.booky.betterview.common.config.BvLevelConfig;
 import dev.booky.betterview.common.hooks.LevelHook;
 import dev.booky.betterview.common.hooks.PlayerHook;
 import dev.booky.betterview.common.util.BetterViewUtil;
@@ -17,9 +18,11 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static dev.booky.betterview.api.ChunkLifecycle.BV_LOADED;
 import static dev.booky.betterview.api.ChunkLifecycle.BV_QUEUED;
@@ -62,6 +65,13 @@ public final class BetterViewPlayer implements BvPlayer {
 
     public boolean enabled = false;
     public volatile boolean initiated = false;
+
+    private int batchChunks = -1;
+    private Instant batchExpiry = Instant.EPOCH;
+    private Instant batchPingExpiry = Instant.EPOCH;
+    private @Nullable Integer batchPingId = null;
+
+    private Instant now = Instant.now();
 
     private final BvExecutor executor = new BvExecutor() {
         @Override
@@ -342,6 +352,10 @@ public final class BetterViewPlayer implements BvPlayer {
             return true;
         }
 
+        if (!this.checkChunkSend()) {
+            return false; // wait for condition
+        }
+
         // if the chunk buffer is empty, assume it's an empty chunk and
         // re-use the statically built empty chunk buffer
         ByteBuf finalChunkBuf = chunkBuf.isReadable()
@@ -393,6 +407,73 @@ public final class BetterViewPlayer implements BvPlayer {
         this.disable();
     }
 
+    public void resetBatch() {
+        BvLevelConfig.BatchConfig config = this.level.getConfig().getChunkBatches();
+        if (!config.isEnabled()) {
+            this.batchChunks = -1;
+            return;
+        }
+        this.batchChunks = config.getChunksPerBatch();
+        this.batchExpiry = this.now.plus(config.getBatchTimeout());
+        this.batchPingId = null; // always reset ping
+    }
+
+    /**
+     * @return whether we are still waiting
+     */
+    public boolean checkBatchPingPending() {
+        if (this.batchPingId == null) {
+            return false;
+        } else if (this.batchPingExpiry.isAfter(this.now)) {
+            return true; // still waiting for ping
+        }
+        // expired, reset batch
+        this.resetBatch();
+        return false;
+    }
+
+    public void sendBatchPing() {
+        int pingId = ThreadLocalRandom.current().nextInt();
+
+        BvLevelConfig.BatchConfig config = this.level.getConfig().getChunkBatches();
+        this.batchPingId = pingId; // really, really tiny chance of conflict
+        this.batchPingExpiry = this.now.plus(config.getBatchWaitTimeout());
+
+        this.player.sendPing(pingId);
+    }
+
+    public boolean handleBatchPong(int pingId) {
+        if (this.batchPingId != null && this.batchPingId == pingId) {
+            this.resetBatch();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkChunkSend() {
+        if (this.batchChunks == -1) {
+            return true; // no batching, always pass
+        }
+        if (this.batchPingId != null) {
+            if (this.checkBatchPingPending()) {
+                return false; // waiting for ping response
+            }
+        } else if (this.batchExpiry.isBefore(this.now)) {
+            this.resetBatch();
+        }
+
+        if (--this.batchChunks == 0) {
+            // send ping to player and wait for acknowledgment
+            this.sendBatchPing();
+        }
+        return true; // pass
+    }
+
+    public void updateNow() {
+        // reduce useless system clock accesses
+        this.now = Instant.now();
+    }
+
     /**
      * @return true if this player should be fully ticked
      */
@@ -425,10 +506,15 @@ public final class BetterViewPlayer implements BvPlayer {
     }
 
     public void enable(int clientDistance) {
-        if (!this.enabled) {
-            this.enabled = true;
-            this.updateDistance(clientDistance);
+        if (this.enabled) {
+            return;
         }
+        this.enabled = true;
+
+        this.updateNow();
+        this.resetBatch();
+
+        this.updateDistance(clientDistance);
     }
 
     public void disable() {
@@ -436,6 +522,9 @@ public final class BetterViewPlayer implements BvPlayer {
             return;
         }
         this.enabled = false;
+
+        this.updateNow();
+        this.resetBatch();
 
         // switch back to moonrise view distance
         this.player.sendViewDistancePacket(this.getServerViewDistance());

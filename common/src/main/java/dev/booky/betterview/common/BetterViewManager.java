@@ -158,15 +158,21 @@ public final class BetterViewManager {
             return; // don't tick player
         }
 
+        BvLevelConfig levelConfig = level.getConfig();
+        boolean prepareChunksWhileWaiting = levelConfig.getChunkBatches().isPrepareChunksWhileWaiting();
+
         // start processing chunks (process at least once)
         int chunksPerTick = config.getGlobalConfig().getChunkSendLimit();
-        int chunkQueueSize = level.getConfig().getChunkQueueSize();
+        int chunkQueueSize = levelConfig.getChunkQueueSize();
         do {
             // check if any chunks are built and ready for sending
+            bv.updateNow();
             bv.chunkQueue.removeIf(bv::checkQueueEntry);
 
             if (bv.chunkQueue.size() >= chunkQueueSize) {
                 break; // limit how many chunks a player can queue at once
+            } else if (!prepareChunksWhileWaiting && bv.checkBatchPingPending()) {
+                break; // waiting for batch ping, don't process
             }
 
             McChunkPos nextChunk = bv.pollChunkPos();

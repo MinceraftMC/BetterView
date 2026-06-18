@@ -67,6 +67,12 @@ public class PaperPlayer implements PlayerHook {
     }
 
     @Override
+    public void sendPing(int pingId) {
+        Object packet = PaperNmsInterface.SERVICE.constructClientboundPingPacket(pingId);
+        this.getNettyChannel().write(packet);
+    }
+
+    @Override
     public Channel getNettyChannel() {
         return PaperNmsInterface.SERVICE.getNettyChannel(this.player);
     }

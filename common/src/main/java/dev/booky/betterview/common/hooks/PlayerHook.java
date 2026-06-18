@@ -21,6 +21,8 @@ public interface PlayerHook {
 
     void sendChunkUnload(int chunkX, int chunkZ);
 
+    void sendPing(int pingId);
+
     Channel getNettyChannel();
 
     BetterViewPlayer getBvPlayer();
