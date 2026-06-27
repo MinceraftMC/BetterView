@@ -151,9 +151,6 @@ public final class BetterViewManager {
     private void tickPlayer(PlayerHook player, LevelHook level, McChunkPos chunkPos, BvConfig config, long deadline) {
         BetterViewPlayer bv = player.getBvPlayer();
 
-        // tick player movement
-        bv.move(level, chunkPos);
-
         if (!bv.preTick()) {
             return; // don't tick player
         }

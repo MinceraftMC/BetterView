@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.ArrayDeque;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -54,7 +55,7 @@ public final class BetterViewPlayer implements BvPlayer {
 
     public PlayerHook player;
     public LevelHook level;
-    public McChunkPos chunkPos;
+    public McChunkPos chunkPos = McChunkPos.ZERO;
 
     // a queue of chunk packets currently being built asynchronously
     public final Queue<ChunkQueueEntry> chunkQueue = new ArrayDeque<>();
@@ -94,7 +95,6 @@ public final class BetterViewPlayer implements BvPlayer {
     public BetterViewPlayer(PlayerHook player) {
         this.player = player;
         this.level = player.getLevel();
-        this.chunkPos = player.getChunkPos();
         this.networkDimension = this.level.dimension();
     }
 
@@ -112,8 +112,16 @@ public final class BetterViewPlayer implements BvPlayer {
         this.player = player;
     }
 
-    private boolean canBeActivated(int clientDistance) {
-        if (!this.initiated || !this.level.getConfig().isEnabled()) {
+    private boolean checkActivation(int clientDistance) {
+        if (!this.initiated) {
+            return false;
+        }
+        // ensure server-synced dimension is in sync with network-synced dimension
+        this.level = this.player.getLevel();
+        if (!Objects.equals(this.level.dimension(), this.networkDimension)) {
+            return false;
+        }
+        if (!this.level.getConfig().isEnabled()) {
             return false;
         }
         if (clientDistance < 1) {
@@ -123,15 +131,10 @@ public final class BetterViewPlayer implements BvPlayer {
         return this.getServerViewDistance() < clientDistance;
     }
 
-    public synchronized void tryTriggerStart() {
-        if (!this.initiated) {
-            // reset chunk position as it may be invalid when this instance has been created
-            this.chunkPos = this.player.getChunkPos();
-            this.initiated = true;
-        }
-    }
-
     public void serverChunkAdd(int chunkX, int chunkZ) {
+        if (!this.enabled) {
+            return;
+        }
         if (!this.canStore(chunkX, chunkZ)) {
             LOGGER.error("Can't store server chunk {} {} state for {} at {} in {} with distance {}",
                     chunkX, chunkZ, this.player, this.chunkPos, this.level, this.distance);
@@ -148,6 +151,9 @@ public final class BetterViewPlayer implements BvPlayer {
     }
 
     public boolean serverChunkRemove(int chunkX, int chunkZ) {
+        if (!this.enabled) {
+            return false; // passthrough
+        }
         boolean insideCylinder = BetterViewUtil.isWithinRange(
                 chunkX - this.chunkPos.getX(),
                 chunkZ - this.chunkPos.getZ(),
@@ -218,14 +224,13 @@ public final class BetterViewPlayer implements BvPlayer {
         this.player.sendViewDistancePacket(newDistance);
     }
 
-    public void move(LevelHook newLevel, McChunkPos newPos) {
-        if (newLevel != this.level) {
-            this.level = newLevel;
-            if (this.enabled) {
-                this.handleDimensionReset(null);
-            }
-            return;
-        }
+    /**
+     * Called when server tells client to move center of chunk storage.<br/>
+     * This means, we can use this call to listen for initialization (and movement of course).
+     */
+    public void move(McChunkPos newPos) {
+        // mark as initialized once we know the center of chunk storage
+        this.initiated = true;
 
         McChunkPos previousPos = this.chunkPos;
         if (newPos.getKey() == previousPos.getKey()) {
@@ -405,6 +410,7 @@ public final class BetterViewPlayer implements BvPlayer {
         this.clearChunkQueue();
         // disable temporarily
         this.disable();
+        this.initiated = false;
     }
 
     public void resetBatch() {
@@ -484,7 +490,7 @@ public final class BetterViewPlayer implements BvPlayer {
             if (this.distance == clientDistance && valid) {
                 return true; // continue processing as normal
             }
-            if (!this.canBeActivated(clientDistance)) {
+            if (!this.checkActivation(clientDistance)) {
                 // distance is no longer valid
                 this.unloadBvChunks();
                 this.disable();
@@ -497,7 +503,7 @@ public final class BetterViewPlayer implements BvPlayer {
             this.updateDistance(clientDistance);
         }
         // check if BV can be activated for this player
-        if (!this.canBeActivated(clientDistance)) {
+        if (!this.checkActivation(clientDistance)) {
             return false;
         }
         // enable BV processing and update the view distance

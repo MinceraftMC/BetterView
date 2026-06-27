@@ -8,6 +8,8 @@ import java.util.Objects;
 @NullMarked
 public final class McChunkPos {
 
+    public static final McChunkPos ZERO = new McChunkPos(0, 0);
+
     private final int posX;
     private final int posZ;
     private final long key;
