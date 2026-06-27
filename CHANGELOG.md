@@ -2,6 +2,10 @@
 
 ## What's Changed
 
+- Add support for Fabric 26.2.x ([`e9f3310`](https://github.com/MinceraftMC/BetterView/commit/e9f33100295fca4a32874b8b49ee55c83f0ae1e5))
+- Fix player chunk position synchronization issues ([`6ea4ca4`](https://github.com/MinceraftMC/BetterView/commit/6ea4ca411d4821bf4e4b41c8c974ced6dcd19919), [`1480989`](https://github.com/MinceraftMC/BetterView/commit/1480989b12b4d798074d491d23e43a9760c3b4a0), [`2064ce1`](https://github.com/MinceraftMC/BetterView/commit/2064ce153aff81c3d33155bb6b62f003b974d6f4))
+- Add chunk sending batching option ([`7143aca`](https://github.com/MinceraftMC/BetterView/commit/7143aca07a55837eea006004247489578daac639))
+- Fix compatibility with squaremap/Bluemap by always generating full chunks ([`8adee89`](https://github.com/MinceraftMC/BetterView/commit/8adee892606c904263f95b9131ada245f6d9e18e))
 - Add support for Paper 26.2.x ([`9efc61f`](https://github.com/MinceraftMC/BetterView/commit/9efc61f9fcc24a0534ef5101b38a758102dfe4eb))
 - Fix compatibility with https://github.com/DrexHD/AntiXray ([`3fe18a3`](https://github.com/MinceraftMC/BetterView/commit/3fe18a3b0d63db7061382da28a702150344d1e46))
 - Add default dimension config ([#16](https://github.com/MinceraftMC/BetterView/issues/16), [`81b9e7a`](https://github.com/MinceraftMC/BetterView/commit/81b9e7ad3850bcc641b2fb1c8d18e80f0678cf72), [`b1b1583`](https://github.com/MinceraftMC/BetterView/commit/b1b1583e7d57a2bc64e1803392c67aa44c62e827))
