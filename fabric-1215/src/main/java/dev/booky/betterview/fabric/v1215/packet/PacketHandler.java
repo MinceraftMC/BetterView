@@ -30,7 +30,7 @@ public class PacketHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (!this.handle(msg)) {
+        if (this.player == null || !this.handle(msg)) {
             super.channelRead(ctx, msg);
         }
     }
