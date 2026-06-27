@@ -207,8 +207,6 @@ public class NmsAdapter implements PaperNmsInterface {
             connection.channel.pipeline()
                     .addBefore("packet_handler", BETTERVIEW_HANDLER, new PacketHandler());
         }
-        // inject post-join handling
-        WrappedServerTickManager.inject(server, manager);
     }
 
     @Override
@@ -223,8 +221,6 @@ public class NmsAdapter implements PaperNmsInterface {
                 }
             });
         }
-        // uninject post-join handling
-        WrappedServerTickManager.uninject(server);
     }
 
     @Override
