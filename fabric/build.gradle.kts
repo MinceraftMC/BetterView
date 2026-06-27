@@ -7,7 +7,7 @@ plugins {
     id("betterview.publishing")
 }
 
-val testTaskVersion = "26.1.2"
+val testTaskVersion = "26.2"
 val testTaskJavaVersion = JavaLanguageVersion.of(25)
 val testTaskVersionFiltered = testTaskVersion.replace(".", "")
 

@@ -50,6 +50,8 @@ moonrise-v12111 = "RHK1oePc" # https://modrinth.com/mod/moonrise-opt/version/RHK
 adventure-platform-fabric-v12111 = "6.8.0"
 moonrise-v2612 = "G0OgMSn1" # https://modrinth.com/mod/moonrise-opt/version/G0OgMSn1
 adventure-platform-fabric-v2612 = "6.9.0"
+moonrise-v262 = "W0HImEBl" # https://modrinth.com/mod/moonrise-opt/version/W0HImEBl
+adventure-platform-fabric-v262 = "7.0.0"
 
 [libraries]
 # plugins
