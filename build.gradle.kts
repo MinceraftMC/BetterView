@@ -1,3 +1,7 @@
+plugins {
+    id("betterview.publishing")
+}
+
 allprojects {
     group = "dev.booky.betterview"
     version = "2.2.1-SNAPSHOT"

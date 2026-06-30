@@ -67,5 +67,7 @@ configure<ModPublishExtension> {
 }
 
 tasks.withType<PublishModTask> {
-    dependsOn(jarTaskProvider)
+    if (hasProperty("publishing.platform")) {
+        dependsOn(jarTaskProvider)
+    }
 }
