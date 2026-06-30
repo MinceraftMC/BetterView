@@ -51,7 +51,8 @@ The screenshot below was taken at `0 2250 0` in the end dimension with a view di
 | 1.21.3            | ✅     | ✅      |
 | 1.21.1            | ✅     | ✅      |
 
-On fabric, this mod depends on [Moonrise](https://github.com/Tuinity/Moonrise) to work.
+On fabric, this mod depends on [Moonrise](https://modrinth.com/mod/moonrise-opt) and
+[adventure-platform-mod](https://modrinth.com/mod/adventure-platform-mod) to work.
 
 ## Usage
 
