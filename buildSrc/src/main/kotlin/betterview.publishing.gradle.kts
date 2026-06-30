@@ -61,7 +61,14 @@ configure<ModPublishExtension> {
                 end = property("publishing.modrinth.version.end").toString()
             }
             val loadersStr = property("publishing.modrinth.loaders").toString()
-            modLoaders.addAll(loadersStr.split(","))
+            modLoaders.addAll(loadersStr.split(','))
+
+            findProperty("publishing.modrinth.dependencies")?.toString()?.split(',')?.forEach {
+                requires {
+                    id = it.substringBefore(':')
+                    slug = it.substringAfter(':')
+                }
+            }
         }
     }
 }
