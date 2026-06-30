@@ -23,7 +23,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.ScopedValue;
 import java.util.Arrays;
 
 @NullMarked
@@ -102,46 +101,7 @@ public final class ChunkWriter {
         }
     }
 
-    // compat for https://github.com/DrexHD/AntiXray/blob/849c931e68f4b3c2984edb10a29e2b052f4755cc/common/src/main/java/me/drex/antixray/common/mixin/PalettedContainer%24DataMixin.java#L34
-    private static final @Nullable ScopedValue<@Nullable Object> DREXHD_ANTI_XRAY_PACKET_INFO;
-    private static final @Nullable ScopedValue<Integer> DREXHD_ANTI_XRAY_CHUNK_SECTION_INDEX;
-
-    static {
-        // use reflection to bypass need for compile-time dependency
-        ScopedValue<@Nullable Object> packetInfoVal = null;
-        ScopedValue<Integer> chunkSectionIndexVal = null;
-        try {
-            Class<?> arguments = Class.forName("me.drex.antixray.common.util.Arguments");
-            @SuppressWarnings("unchecked")
-            ScopedValue<@Nullable Object> packetInfo = (ScopedValue<@Nullable Object>) arguments.getField("PACKET_INFO").get(null);
-            @SuppressWarnings("unchecked")
-            ScopedValue<Integer> chunkSectionIndex = (ScopedValue<Integer>) arguments.getField("CHUNK_SECTION_INDEX").get(null);
-            packetInfoVal = packetInfo;
-            chunkSectionIndexVal = chunkSectionIndex;
-        } catch (ReflectiveOperationException ignored) {
-        }
-        DREXHD_ANTI_XRAY_PACKET_INFO = packetInfoVal;
-        DREXHD_ANTI_XRAY_CHUNK_SECTION_INDEX = chunkSectionIndexVal;
-    }
-
     public static void writeFullBody(
-            ByteBuf buf, @Nullable AntiXrayProcessor antiXray, int minSectionY,
-            CompoundTag heightmapsTag, LevelChunkSection[] sections,
-            byte[][] blockLight, byte @Nullable [][] skyLight
-    ) {
-        // https://github.com/DrexHD/AntiXray/blob/849c931e68f4b3c2984edb10a29e2b052f4755cc/common/src/main/java/me/drex/antixray/common/mixin/PalettedContainer%24DataMixin.java#L34
-        // this has a hard dependency on two scope-specific values, so set them to prevent errors
-        if (DREXHD_ANTI_XRAY_PACKET_INFO != null && DREXHD_ANTI_XRAY_CHUNK_SECTION_INDEX != null) {
-            ScopedValue
-                    .where(DREXHD_ANTI_XRAY_PACKET_INFO, null)
-                    .where(DREXHD_ANTI_XRAY_CHUNK_SECTION_INDEX, 0)
-                    .run(() -> writeFullBody0(buf, antiXray, minSectionY, heightmapsTag, sections, blockLight, skyLight));
-        } else {
-            writeFullBody0(buf, antiXray, minSectionY, heightmapsTag, sections, blockLight, skyLight);
-        }
-    }
-
-    private static void writeFullBody0(
             ByteBuf buf, @Nullable AntiXrayProcessor antiXray, int minSectionY,
             CompoundTag heightmapsTag, LevelChunkSection[] sections,
             byte[][] blockLight, byte @Nullable [][] skyLight
