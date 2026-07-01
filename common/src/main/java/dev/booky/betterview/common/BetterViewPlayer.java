@@ -396,17 +396,21 @@ public final class BetterViewPlayer implements BvPlayer {
     }
 
     public void handleDimensionReset(@Nullable Object networkDimension) {
+        boolean reset = true;
         if (networkDimension != null) {
             if (this.networkDimension.equals(networkDimension)) {
-                return; // nothing to do
+                reset = false; // level doesn't get re-created on client during respawn
             }
             this.networkDimension = networkDimension; // update dimension
         }
 
-        // don't sent any unload packets on bulk unload
-        for (int i = 0, len = this.chunkStates.length; i < len; i++) {
-            this.chunkStates[i].set(0, 0, UNLOADED);
+        if (reset) {
+            // don't sent any unload packets on bulk unload
+            for (int i = 0, len = this.chunkStates.length; i < len; i++) {
+                this.chunkStates[i].set(0, 0, UNLOADED);
+            }
         }
+
         this.clearChunkQueue();
         // disable temporarily
         this.disable();
