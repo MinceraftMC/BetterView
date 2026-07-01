@@ -615,12 +615,12 @@ public final class BetterViewPlayer implements BvPlayer {
     ) {
 
         public ChunkQueueEntry retain() {
-            this.future.thenApply(ReferenceCountUtil::retain);
+            this.future.thenAccept(ReferenceCountUtil::retain);
             return this;
         }
 
         public ChunkQueueEntry release() {
-            this.future.thenApply(ReferenceCountUtil::release);
+            this.future.thenAccept(ReferenceCountUtil::release);
             return this;
         }
     }
