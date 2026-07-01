@@ -12,7 +12,6 @@ import dev.booky.betterview.common.util.ChunkTagResult;
 import dev.booky.betterview.common.util.McChunkPos;
 import dev.booky.betterview.nms.PaperNmsInterface;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import net.kyori.adventure.key.Key;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
@@ -107,5 +106,10 @@ public class PaperLevel implements LevelHook {
     @Override
     public Key getName() {
         return this.world.key();
+    }
+
+    @Override
+    public String toString() {
+        return this.world.toString();
     }
 }

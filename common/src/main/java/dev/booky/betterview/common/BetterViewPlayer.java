@@ -136,8 +136,8 @@ public final class BetterViewPlayer implements BvPlayer {
             return;
         }
         if (!this.canStore(chunkX, chunkZ)) {
-            LOGGER.error("Can't store server chunk {} {} state for {} at {} in {} with distance {}",
-                    chunkX, chunkZ, this.player, this.chunkPos, this.level, this.distance);
+            LOGGER.error("Can't store server chunk {} {} state for {} at {} in {}/{} with distance {}",
+                    chunkX, chunkZ, this.player, this.chunkPos, this.level, this.networkDimension, this.distance);
             return;
         }
         int chunkIndex = calcIndex(chunkX, chunkZ, this.storageDiameter);
