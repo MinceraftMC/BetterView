@@ -134,28 +134,26 @@ public final class BetterViewManager {
         long maxTimePerPlayerNanos = (nettyThreadCount * tickLengthNanos) / Math.max(nettyThreadCount, players.size());
 
         for (PlayerHook player : players) {
-            LevelHook level = player.getLevel();
-            McChunkPos chunkPos = player.getChunkPos();
             // switch to netty threads for ticking
             player.getNettyChannel().eventLoop().execute(() -> {
                 try {
                     long deadline = System.nanoTime() + maxTimePerPlayerNanos;
-                    this.tickPlayer(player, level, chunkPos, config, deadline);
+                    this.tickPlayer(player, config, deadline);
                 } catch (Throwable throwable) {
-                    LOGGER.error("Error while ticking player {} in level {}", player, level, throwable);
+                    LOGGER.error("Error while ticking player {} in level {}", player, player.getLevel(), throwable);
                 }
             });
         }
     }
 
-    private void tickPlayer(PlayerHook player, LevelHook level, McChunkPos chunkPos, BvConfig config, long deadline) {
+    private void tickPlayer(PlayerHook player, BvConfig config, long deadline) {
         BetterViewPlayer bv = player.getBvPlayer();
 
         if (!bv.preTick()) {
             return; // don't tick player
         }
 
-        BvLevelConfig levelConfig = level.getConfig();
+        BvLevelConfig levelConfig = bv.getLevel().getConfig();
         boolean prepareChunksWhileWaiting = levelConfig.getChunkBatches().isPrepareChunksWhileWaiting();
 
         // start processing chunks (process at least once)
@@ -178,7 +176,7 @@ public final class BetterViewManager {
             }
 
             // start building chunk queue and add to processing queue
-            CompletableFuture<@Nullable ByteBuf> future = level.getChunkCache().get(nextChunk).get();
+            CompletableFuture<@Nullable ByteBuf> future = player.getLevel().getChunkCache().get(nextChunk).get();
             ChunkQueueEntry queueEntry = new ChunkQueueEntry(nextChunk, future);
             bv.chunkQueue.add(queueEntry.retain());
 
