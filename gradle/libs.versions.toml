@@ -53,6 +53,8 @@ moonrise-v2612 = "G0OgMSn1" # https://modrinth.com/mod/moonrise-opt/version/G0Og
 adventure-platform-fabric-v2612 = "6.9.0"
 moonrise-v262 = "W0HImEBl" # https://modrinth.com/mod/moonrise-opt/version/W0HImEBl
 adventure-platform-fabric-v262 = "7.0.0"
+moonrise-v263 = "W0HImEBl" # https://modrinth.com/mod/moonrise-opt/version/W0HImEBl
+adventure-platform-fabric-v263 = "7.2.0"
 
 [libraries]
 # plugins
