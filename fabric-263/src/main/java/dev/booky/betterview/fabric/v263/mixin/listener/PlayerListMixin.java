@@ -30,7 +30,7 @@ public class PlayerListMixin {
                     remap = false
             )
     )
-    private void postPlayerAdd(CallbackInfo ci, @Local(argsOnly = true) ServerPlayer player) {
+    private void postPlayerAdd(CallbackInfo ci, @Local(argsOnly = true, name = "player") ServerPlayer player) {
         BetterViewManager manager = BetterViewMod.INSTANCE.getManager();
         manager.getPlayerOrNull(player.getUUID()); // load player
     }
@@ -45,8 +45,8 @@ public class PlayerListMixin {
     )
     private void postGameProtocolSetup(
             CallbackInfo ci,
-            @Local(argsOnly = true) Connection connection,
-            @Local(argsOnly = true) ServerPlayer player
+            @Local(argsOnly = true, name = "connection") Connection connection,
+            @Local(argsOnly = true, name = "player") ServerPlayer player
     ) {
         ChannelHandler handler = connection.channel.pipeline().get(PacketHandler.HANDLER_NAME);
         ((PacketHandler) handler).setPlayer(((PlayerHook) player).getBvPlayer());

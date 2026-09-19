@@ -56,7 +56,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         assert this.player != null;
         return switch (input) {
             case ClientboundLevelChunkWithLightPacket packet -> {
-                this.player.serverChunkAdd(packet.getX(), packet.getZ());
+                this.player.serverChunkAdd(packet.x(), packet.z());
                 yield false;
             }
             case ClientboundForgetLevelChunkPacket packet -> {
