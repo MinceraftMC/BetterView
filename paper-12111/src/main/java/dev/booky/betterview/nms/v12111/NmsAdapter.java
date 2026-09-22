@@ -28,7 +28,9 @@ import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -140,16 +142,19 @@ public class NmsAdapter implements PaperNmsInterface {
     @Override
     public CompletableFuture<@Nullable ChunkTagResult> readChunkTag(World world, @Nullable AntiXrayProcessor antiXray, McChunkPos chunkPos) {
         ServerLevel level = ((CraftWorld) world).getHandle();
-        ChunkPos nmsPos = new ChunkPos(chunkPos.getX(), chunkPos.getZ());
-        return level.chunkSource.chunkMap.read(nmsPos).thenApplyAsync(tag -> {
-            if (tag.isEmpty()) {
-                return null;
-            } else if (!ChunkTagTransformer.isChunkLit(tag.get())) {
-                return ChunkTagResult.EMPTY;
-            }
-            ByteBuf chunkBuf = ChunkTagTransformer.transformToBytesOrEmpty(level, tag.get(), antiXray, nmsPos);
-            return new ChunkTagResult(chunkBuf);
-        });
+        ChunkPos mcPos = new ChunkPos(chunkPos.getX(), chunkPos.getZ());
+        ChunkMap chunkMap = level.getChunkSource().chunkMap;
+        return chunkMap.read(mcPos)
+                .thenApplyAsync(tag -> tag.map(chunkMap::upgradeChunkTag), Util.backgroundExecutor())
+                .thenApplyAsync(tag -> {
+                    if (tag.isEmpty()) {
+                        return null;
+                    } else if (!ChunkTagTransformer.isChunkLit(tag.get())) {
+                        return ChunkTagResult.EMPTY;
+                    }
+                    ByteBuf chunkBuf = ChunkTagTransformer.transformToBytesOrEmpty(level, tag.get(), antiXray, mcPos);
+                    return new ChunkTagResult(chunkBuf);
+                });
     }
 
     @Override

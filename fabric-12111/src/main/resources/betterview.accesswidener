@@ -15,6 +15,7 @@ accessible field net/minecraft/server/level/ServerChunkCache ticketStorage Lnet/
 accessible method net/minecraft/server/level/ServerChunkCache getVisibleChunkIfPresent (J)Lnet/minecraft/server/level/ChunkHolder;
 accessible method net/minecraft/server/level/ChunkMap getPlayerViewDistance (Lnet/minecraft/server/level/ServerPlayer;)I
 accessible method net/minecraft/server/level/ServerChunkCache runDistanceManagerUpdates ()Z
+accessible method net/minecraft/server/level/ChunkMap readChunk (Lnet/minecraft/world/level/ChunkPos;)Ljava/util/concurrent/CompletableFuture;
 
 # Classes
 accessible class net/minecraft/world/level/chunk/PalettedContainer$Data

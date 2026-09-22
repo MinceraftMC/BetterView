@@ -122,7 +122,7 @@ public abstract class ServerLevelMixin extends Level implements WorldGenLevel {
 
     public CompletableFuture<@Nullable ChunkTagResult> betterview$readChunk(McChunkPos chunkPos) {
         ChunkPos vanillaPos = new ChunkPos(chunkPos.getX(), chunkPos.getZ());
-        return this.chunkSource.chunkMap.read(vanillaPos).thenApplyAsync(tag -> {
+        return this.chunkSource.chunkMap.readChunk(vanillaPos).thenApplyAsync(tag -> {
             if (tag.isEmpty()) {
                 return null;
             } else if (!ChunkTagTransformer.isChunkLit(tag.get())) {
