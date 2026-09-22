@@ -217,7 +217,9 @@ public final class BetterViewManager {
 
     public void unregisterPlayer(UUID playerId) {
         PlayerHook player = this.players.remove(playerId);
-        player.getNettyChannel().eventLoop().execute(player.getBvPlayer()::release);
+        if (player != null) {
+            player.getNettyChannel().eventLoop().execute(player.getBvPlayer()::release);
+        }
     }
 
     public BvLevelConfig getConfig(Key worldName) {

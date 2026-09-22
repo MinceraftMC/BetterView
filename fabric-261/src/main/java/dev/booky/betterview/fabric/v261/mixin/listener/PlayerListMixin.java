@@ -6,6 +6,7 @@ import dev.booky.betterview.common.BetterViewManager;
 import dev.booky.betterview.common.hooks.PlayerHook;
 import dev.booky.betterview.fabric.v261.BetterViewMod;
 import dev.booky.betterview.fabric.v261.packet.PacketHandler;
+import dev.booky.betterview.fabric.v261.packet.PacketUtil;
 import io.netty.channel.ChannelHandler;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,6 +32,9 @@ public class PlayerListMixin {
             )
     )
     private void postPlayerAdd(CallbackInfo ci, @Local(argsOnly = true) ServerPlayer player) {
+        if (PacketUtil.isFakeConnection(player.connection.connection)) {
+            return;
+        }
         BetterViewManager manager = BetterViewMod.INSTANCE.getManager();
         manager.getPlayerOrNull(player.getUUID()); // load player
     }
@@ -48,6 +52,9 @@ public class PlayerListMixin {
             @Local(argsOnly = true) Connection connection,
             @Local(argsOnly = true) ServerPlayer player
     ) {
+        if (PacketUtil.isFakeConnection(connection)) {
+            return;
+        }
         ChannelHandler handler = connection.channel.pipeline().get(PacketHandler.HANDLER_NAME);
         ((PacketHandler) handler).setPlayer(((PlayerHook) player).getBvPlayer());
     }
@@ -58,6 +65,9 @@ public class PlayerListMixin {
     )
     private void postPlayerRespawn(CallbackInfoReturnable<ServerPlayer> ci) {
         ServerPlayer player = ci.getReturnValue();
+        if (PacketUtil.isFakeConnection(player.connection.connection)) {
+            return;
+        }
 
         // unregister player with this uuid and register again to handle respawning
         BetterViewManager manager = BetterViewMod.INSTANCE.getManager();
@@ -73,6 +83,8 @@ public class PlayerListMixin {
             at = @At("TAIL")
     )
     private void postPlayerRemoval(ServerPlayer player, CallbackInfo ci) {
-        BetterViewMod.INSTANCE.getManager().unregisterPlayer(player.getUUID());
+        if (!PacketUtil.isFakeConnection(player.connection.connection)) {
+            BetterViewMod.INSTANCE.getManager().unregisterPlayer(player.getUUID());
+        }
     }
 }

@@ -4,9 +4,11 @@ package dev.booky.betterview.fabric.v1217.packet;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
@@ -53,5 +55,9 @@ public class PacketUtil {
                     .noneMatch(state -> state != null && !state.isAir());
         }
         return false;
+    }
+
+    public static boolean isFakeConnection(Connection connection) {
+        return connection.channel instanceof EmbeddedChannel;
     }
 }
