@@ -107,10 +107,10 @@ public final class LightWriter {
         }
 
         // write light data
-        writeBitSet(buf, notSkyEmpty.toLongArray());
-        writeBitSet(buf, notBlockEmpty.toLongArray());
-        writeBitSet(buf, skyEmpty.toLongArray());
-        writeBitSet(buf, blockEmpty.toLongArray());
+        writeBitSet(buf, notSkyEmpty);
+        writeBitSet(buf, notBlockEmpty);
+        writeBitSet(buf, skyEmpty);
+        writeBitSet(buf, blockEmpty);
         writeByteArrayList(buf, skyData);
         writeByteArrayList(buf, blockData);
     }
@@ -134,19 +134,18 @@ public final class LightWriter {
 
         // write light data
         buf.writeByte(0); // sky light y mask length
-        writeBitSet(buf, notBlockEmpty.toLongArray());
+        writeBitSet(buf, notBlockEmpty);
         buf.writeByte(0); // sky light empty y mask length
-        writeBitSet(buf, blockEmpty.toLongArray());
+        writeBitSet(buf, blockEmpty);
         buf.writeByte(0); // sky light data length
         writeByteArrayList(buf, blockData);
     }
 
-    private static void writeBitSet(ByteBuf buf, long[] set) {
-        int len = set.length;
-        VarInt.write(buf, len);
-        for (int i = 0; i < len; ++i) {
-            buf.writeLong(set[i]);
-        }
+    private static void writeBitSet(ByteBuf buf, BitSet set) {
+        // useless allocation, but we would need a lot of more work otherwise
+        byte[] bytes = set.toByteArray();
+        VarInt.write(buf, bytes.length);
+        buf.writeBytes(bytes);
     }
 
     private static void writeByteArrayList(ByteBuf buf, List<byte[]> list) {
