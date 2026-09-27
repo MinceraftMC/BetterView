@@ -114,8 +114,8 @@ an optimal experience on your server setup.
 ## API Usage
 
 Maven Repository: `https://repo.minceraft.dev/releases/` \
-Maven Artifact: `dev.booky.betterview:betterview-api:2.2.0` \
-Javadoc: https://repo.minceraft.dev/javadoc/releases/dev/booky/betterview/betterview-api/2.2.0
+Maven Artifact: `dev.booky.betterview:betterview-api:2.2.1` \
+Javadoc: https://repo.minceraft.dev/javadoc/releases/dev/booky/betterview/betterview-api/2.2.1
 
 <details>
 <summary><strong>Example for Paper</strong></summary>
