@@ -65,8 +65,7 @@ configure<ModPublishExtension> {
 
             findProperty("publishing.modrinth.dependencies")?.toString()?.split(',')?.forEach {
                 requires {
-                    id = it.substringBefore(':')
-                    slug = it.substringAfter(':')
+                    id = it
                 }
             }
         }
