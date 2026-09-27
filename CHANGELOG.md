@@ -1,3 +1,16 @@
+# v2.2.1
+
+## What's Changed
+
+- Fix missing chunk upgrading ([`5c1289d`](https://github.com/MinceraftMC/BetterView/commit/5c1289d926f527aa6d5767214cb4ea2338b9afb8))
+- Fix support for fabric carpet mod fake players ([`19e7dff`](https://github.com/MinceraftMC/BetterView/commit/19e7dffb332084aa445ef4f513f3e2771036ba9b))
+- Add support for Fabric 26.3.x ([`42a52cf`](https://github.com/MinceraftMC/BetterView/commit/42a52cf1aa23ee634dd29430542895d8c7e8db97), [`75ed841`](https://github.com/MinceraftMC/BetterView/commit/75ed841c7b377b8f61a18f76b18d2174877c6dfb), [`96bd08d`](https://github.com/MinceraftMC/BetterView/commit/96bd08d0c6990b8cd05eb598ceaa670a4d893e5b), [`ebfa6ec`](https://github.com/MinceraftMC/BetterView/commit/ebfa6ec6fe35f7e6dfda7dab3fa33fe3d6e696f1))
+- Add support for Paper 26.3.x ([`e787402`](https://github.com/MinceraftMC/BetterView/commit/e787402282c3d9ea5a5698d08a89c52c0ac3fd36), [`017ecac`](https://github.com/MinceraftMC/BetterView/commit/017ecacfaf4d0c0b01c5ff21ac98e1b5f016023e))
+- Fix dimension switch race condition ([`e39b08f`](https://github.com/MinceraftMC/BetterView/commit/e39b08f0b33b687d2f83150306b4757bac219168), [`5c1697c`](https://github.com/MinceraftMC/BetterView/commit/5c1697cb367f4a656726da3b65a82c4d53141b96))
+- Fix issue with fabric mod for versions older than 26.1 ([`b9cdeb5`](https://github.com/MinceraftMC/BetterView/commit/b9cdeb5222cea9d0f8c07f5e677f83f45785bcbe))
+
+**Full Changelog**: [`v2.2.0...v2.2.1`](https://github.com/MinceraftMC/BetterView/compare/v2.2.0...v2.2.1)
+
 # v2.2.0
 
 ## What's Changed
