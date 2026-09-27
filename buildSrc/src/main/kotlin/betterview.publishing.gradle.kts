@@ -30,7 +30,7 @@ configure<ModPublishExtension> {
             repository = providers.environmentVariable("GITHUB_REPOSITORY")
             commitish = providers.environmentVariable("GITHUB_REF_NAME")
             tagName = version.map { "v${it}" }
-            displayName = version
+            displayName = "BetterView v${version}"
 
             // won't be empty, just so the publishing plugin won't complain
             allowEmptyFiles = true
