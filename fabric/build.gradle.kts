@@ -36,8 +36,9 @@ dependencies {
         .forEach { include(it) }
 
     // version-specific runtime mods
-    val moonriseVersion = libs.versions.hackGetVersion("moonrise.v$testTaskVersionFiltered")
-    productionRuntimeMods("maven.modrinth:moonrise-opt:$moonriseVersion")
+    // moonrise intentionally omitted for vanilla-path support
+    // val moonriseVersion = libs.versions.hackGetVersion("moonrise.v$testTaskVersionFiltered")
+    // productionRuntimeMods("maven.modrinth:moonrise-opt:$moonriseVersion")
     val adventureVersion = libs.versions.hackGetVersion("adventure.platform.fabric.v$testTaskVersionFiltered")
     productionRuntimeMods("net.kyori:adventure-platform-fabric:$adventureVersion")
 }

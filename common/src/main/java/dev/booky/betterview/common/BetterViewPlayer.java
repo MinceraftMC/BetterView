@@ -166,12 +166,22 @@ public final class BetterViewPlayer implements BvPlayer {
             }
             return false; // don't keep loaded
         }
-        // remove server-loaded state, as it has basically been unloaded for the server;
-        // we shouldn't need to check whether we can store this chunk or not as the
-        // storage has a larger size than our cylindrical distance check
+        // vanilla unloaded a chunk still inside BV range. Cancel forget if BV already
+        // sent it OR is about to (BV_QUEUED). Dropping the queue here races ticket
+        // removal and can leave permanent holes.
         int chunkIndex = calcIndex(chunkX, chunkZ, this.storageDiameter);
-        this.chunkStates[chunkIndex].set(chunkX, chunkZ, BV_LOADED);
-        return true; // keep loaded
+        ChunkState state = this.chunkStates[chunkIndex];
+        if (state.chunkX != chunkX || state.chunkZ != chunkZ) {
+            return false; // stale slot for a different chunk
+        }
+        if (state.lifecycle.isLoaded()) {
+            state.set(chunkX, chunkZ, BV_LOADED);
+            return true;
+        }
+        if (state.lifecycle == BV_QUEUED) {
+            return true; // keep building/sending
+        }
+        return false;
     }
 
     public int getServerViewDistance() {
@@ -236,8 +246,6 @@ public final class BetterViewPlayer implements BvPlayer {
         if (newPos.getKey() == previousPos.getKey()) {
             return; // nothing changed
         }
-        this.chunkPos = newPos;
-
         // reset iteration index to ensure we iterate the chunk positions in the correct order
         this.iterationIndex = 0;
 
@@ -245,11 +253,20 @@ public final class BetterViewPlayer implements BvPlayer {
             // check whether the player moved more than twice the view distance
             // (meaning all chunks would get discarded)
             if (previousPos.distanceSquared(newPos) > this.distance * this.distance) {
+                // unload against the previous centre before we move chunkPos
                 this.unloadBvChunks();
+                for (ChunkState state : this.chunkStates) {
+                    state.set(0, 0, UNLOADED); // also clear SERVER_LOADED aliases
+                }
+                this.chunkPos = newPos;
                 this.disable();
                 return; // skip useless unload checks
             }
+        }
 
+        this.chunkPos = newPos;
+
+        if (this.enabled) {
             // unload chunks which are no longer in range
             int centerX = this.chunkPos.getX();
             int centerZ = this.chunkPos.getZ();
@@ -293,7 +310,7 @@ public final class BetterViewPlayer implements BvPlayer {
 
             int chunkIndex = calcIndex(chunkX, chunkZ, this.storageDiameter);
             ChunkState state = this.chunkStates[chunkIndex];
-            if (state.lifecycle != UNLOADED) {
+            if (state.lifecycle != UNLOADED && state.chunkX == chunkX && state.chunkZ == chunkZ) {
                 continue; // already loaded (or queued)
             }
 
@@ -331,7 +348,7 @@ public final class BetterViewPlayer implements BvPlayer {
         McChunkPos chunkPos = entry.chunkPos;
         int chunkIndex = calcIndex(chunkPos.getX(), chunkPos.getZ(), this.storageDiameter);
         ChunkState state = this.chunkStates[chunkIndex];
-        if (state.lifecycle != BV_QUEUED) {
+        if (state.lifecycle != BV_QUEUED || state.chunkX != chunkPos.getX() || state.chunkZ != chunkPos.getZ()) {
             entry.release();
             return true; // chunk no longer queued, remove entry
         }
@@ -342,6 +359,7 @@ public final class BetterViewPlayer implements BvPlayer {
             LOGGER.error("Error while building chunk {} for {} in {}",
                     chunkPos, this.player, this.level, exception);
             state.lifecycle = UNLOADED;
+            this.iterationIndex = 0;
             entry.release();
             return true;
         }
@@ -383,12 +401,15 @@ public final class BetterViewPlayer implements BvPlayer {
             int chunkIndex = calcIndex(chunkX, chunkZ, this.storageDiameter);
 
             ChunkState state = this.chunkStates[chunkIndex];
+            if (state.chunkX != chunkX || state.chunkZ != chunkZ) {
+                continue; // slot belongs to a different chunk
+            }
             ChunkLifecycle lifecycle = state.lifecycle;
             if (lifecycle == BV_LOADED || lifecycle == BV_QUEUED) {
                 if (lifecycle == BV_LOADED) {
                     this.player.sendChunkUnload(chunkX, chunkZ);
                 }
-                state.lifecycle = UNLOADED; // mark as unloaded
+                state.set(0, 0, UNLOADED); // mark as unloaded
             }
         }
         // clear all chunks which are currently queued for sending
@@ -571,7 +592,11 @@ public final class BetterViewPlayer implements BvPlayer {
         if (!this.canStore(chunkX, chunkZ)) {
             return UNLOADED;
         }
-        return this.chunkStates[calcIndex(chunkX, chunkZ, this.storageDiameter)].lifecycle;
+        ChunkState state = this.chunkStates[calcIndex(chunkX, chunkZ, this.storageDiameter)];
+        if (state.chunkX != chunkX || state.chunkZ != chunkZ) {
+            return UNLOADED;
+        }
+        return state.lifecycle;
     }
 
     @Override

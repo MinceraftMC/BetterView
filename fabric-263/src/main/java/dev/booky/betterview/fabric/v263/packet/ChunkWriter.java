@@ -1,7 +1,6 @@
 package dev.booky.betterview.fabric.v263.packet;
 // Created by booky10 in BetterView (20:38 03.06.2025)
 
-import ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
 import dev.booky.betterview.common.util.BetterViewUtil;
 import io.netty.buffer.ByteBuf;
@@ -69,8 +68,9 @@ public final class ChunkWriter {
         byte[][] blockLight;
         byte[][] skyLight;
         if (MoonriseUtil.INSTALLED) {
-            blockLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getBlockNibbles(), false);
-            skyLight = LightWriter.convertStarlightToBytes(((StarlightChunk) chunk).starlight$getSkyNibbles(), true);
+            // StarlightCompat is a separate class so ChunkWriter can load without Moonrise
+            blockLight = StarlightCompat.blockLight(chunk, false);
+            skyLight = StarlightCompat.skyLight(chunk, true);
         } else {
             blockLight = LightWriter.convertLightToBytes(level, level.getLightEngine().getLayerListener(LightLayer.BLOCK), chunk.getPos(), false);
             skyLight = LightWriter.convertLightToBytes(level, level.getLightEngine().getLayerListener(LightLayer.SKY), chunk.getPos(), true);

@@ -1,0 +1,13 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "dev.booky.betterview.fabric.v263.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "injectors": {
+    "defaultRequire": 0,
+    "maxShiftBy": 1
+  },
+  "mixins": [
+    "accessor.SWMRNibbleArrayAccessor"
+  ]
+}
