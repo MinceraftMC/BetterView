@@ -1,17 +1,11 @@
 package dev.booky.betterview.fabric.v263.packet;
 // Created by booky10 in BetterView (4:58 PM 10.04.2026)
 
-import ca.spottedleaf.moonrise.common.PlatformHooks;
-import ca.spottedleaf.moonrise.libs.ca.spottedleaf.concurrentutil.util.Priority;
-import ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel;
-import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder;
 import dev.booky.betterview.common.util.McChunkPos;
 import net.minecraft.server.level.ChunkHolder;
-import net.minecraft.server.level.ChunkLevel;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.Ticket;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.ChunkPos;
@@ -20,8 +14,6 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
@@ -36,12 +28,7 @@ public final class MoonriseUtil {
         }
     });
 
-    /// used for batching chunk generation tasks on the main thread as vanilla has horrible
-    /// performance if only generating one chunk at a time
-    private static final Map<Long, CompletableFuture<ChunkAccess>> GENERATION_QUEUE = new HashMap<>();
-
     public static final ChunkStatus TARGET_STATUS = INSTALLED ? ChunkStatus.LIGHT : ChunkStatus.FULL;
-    private static final int TARGET_LEVEL = ChunkLevel.byStatus(TARGET_STATUS);
 
     private MoonriseUtil() {
     }
@@ -58,68 +45,45 @@ public final class MoonriseUtil {
             }, level.getChunkSource().mainThreadProcessor);
         }
 
-        NewChunkHolder holder = ((ChunkSystemServerLevel) level).moonrise$getChunkTaskScheduler().chunkHolderManager.getChunkHolder(chunkPos.getKey());
-        if (holder == null) {
-            return CompletableFuture.completedFuture(null);
-        }
-        return CompletableFuture.completedFuture(holder.getChunkIfPresent(TARGET_STATUS));
+        return CompletableFuture.completedFuture(MoonriseHooks.getLoadedChunk(level, chunkPos, TARGET_STATUS));
     }
 
     public static CompletableFuture<ChunkAccess> getGeneratedChunk(ServerLevel level, int chunkX, int chunkZ) {
         if (!INSTALLED) {
-            synchronized (GENERATION_QUEUE) {
-                return GENERATION_QUEUE.computeIfAbsent(ChunkPos.pack(chunkX, chunkZ),
-                        __ -> new CompletableFuture<>());
-            }
+            return generateVanillaAsync(level, chunkX, chunkZ);
         }
-        CompletableFuture<ChunkAccess> future = new CompletableFuture<>();
-        PlatformHooks.get().scheduleChunkLoad(level, chunkX, chunkZ, true,
-                ChunkStatus.FULL, true, Priority.LOW,
-                future::complete);
-        return future;
+        return MoonriseHooks.getGeneratedChunk(level, chunkX, chunkZ);
+    }
+
+    /// Off-main getChunkFuture (no managedBlock). Do not remove the hold ticket
+    /// early or vanilla Forget races the BV send.
+    ///
+    /// Ticket choice (26.3 / 1.21.2+): ENDER_PEARL. 40 ticks, loads+simulates, no
+    /// persist. Added in 1.21.2. On 1.21.1 use TicketType.create("betterview", cmp)
+    /// (timeout 0) instead.
+    private static CompletableFuture<ChunkAccess> generateVanillaAsync(ServerLevel level, int chunkX, int chunkZ) {
+        ServerChunkCache source = level.getChunkSource();
+        ChunkPos pos = new ChunkPos(chunkX, chunkZ);
+        return CompletableFuture
+                .runAsync(() -> source.addTicketWithRadius(TicketType.ENDER_PEARL, pos, 0), source.mainThreadProcessor)
+                .thenComposeAsync(__ -> source.getChunkFuture(chunkX, chunkZ, ChunkStatus.FULL, true),
+                        Util.backgroundExecutor())
+                .thenApply(result -> {
+                    ChunkAccess chunk = result == null ? null : result.orElse(null);
+                    if (chunk == null) {
+                        CompletableFuture.runAsync(
+                                () -> source.removeTicketWithRadius(TicketType.ENDER_PEARL, pos, 0),
+                                source.mainThreadProcessor);
+                        throw new IllegalStateException("Failed to generate chunk at " + pos);
+                    }
+                    return chunk;
+                });
     }
 
     public static int getSendViewDistance(ServerPlayer player) {
-        if (!MoonriseUtil.INSTALLED) {
+        if (!INSTALLED) {
             return player.level().getChunkSource().chunkMap.getPlayerViewDistance(player);
         }
-        return PlatformHooks.get().getSendViewDistance(player);
-    }
-
-    /// needs to be called on main thread
-    public static void tickChunkGenerationQueue(ServerChunkCache chunkSource) {
-        if (!INSTALLED) {
-            return;
-        }
-
-        // schedule chunk generation tasks
-        synchronized (GENERATION_QUEUE) {
-            // add tickets for all chunks
-            for (long chunkKey : GENERATION_QUEUE.keySet()) {
-                chunkSource.ticketStorage.addTicket(chunkKey, new Ticket(TicketType.UNKNOWN, TARGET_LEVEL));
-            }
-            // load chunks by running ticket updates
-            chunkSource.distanceManager.runAllUpdates(chunkSource.chunkMap);
-
-            for (Map.Entry<Long, CompletableFuture<ChunkAccess>> entry : GENERATION_QUEUE.entrySet()) {
-                // chunk should be loaded after adding ticket for it
-                ChunkHolder chunkHolder = chunkSource.getVisibleChunkIfPresent(entry.getKey());
-                if (chunkHolder == null || chunkHolder.getTicketLevel() > TARGET_LEVEL) {
-                    throw new IllegalStateException("Failed to get chunk holder after loading at " + entry.getKey());
-                }
-                // run generation tasks in parallel
-                CompletableFuture<ChunkAccess> future = entry.getValue();
-                chunkHolder.scheduleChunkGenerationTask(TARGET_STATUS, chunkSource.chunkMap)
-                        .thenApply(result -> result.orElseThrow(() -> new IllegalStateException("Failed to generate chunk at " + entry.getKey())))
-                        .whenComplete((chunk, error) -> {
-                            if (error != null) {
-                                future.completeExceptionally(error);
-                            } else {
-                                future.complete(chunk);
-                            }
-                        });
-            }
-            GENERATION_QUEUE.clear();
-        }
+        return MoonriseHooks.getSendViewDistance(player);
     }
 }

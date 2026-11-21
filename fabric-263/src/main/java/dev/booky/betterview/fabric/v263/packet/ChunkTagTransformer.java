@@ -1,7 +1,6 @@
 package dev.booky.betterview.fabric.v263.packet;
 // Created by booky10 in BetterView (21:19 03.06.2025)
 
-import ca.spottedleaf.moonrise.patches.starlight.util.SaveUtil;
 import com.mojang.serialization.Codec;
 import dev.booky.betterview.common.antixray.AntiXrayProcessor;
 import io.netty.buffer.ByteBuf;
@@ -52,9 +51,9 @@ public final class ChunkTagTransformer {
         if (!MoonriseUtil.INSTALLED) {
             return true; // vanilla light
         }
-        // check whether starlight version matches
-        Optional<Integer> lightVersion = tag.getInt(SaveUtil.STARLIGHT_VERSION_TAG);
-        return lightVersion.isPresent() && lightVersion.get() == SaveUtil.getLightVersion();
+        // StarlightCompat moved to a separate class to keep make vanilla booting
+        // possible without Moonrise
+        return StarlightCompat.isMatchingStarlightVersion(tag);
     }
 
     private static boolean extractChunkData(

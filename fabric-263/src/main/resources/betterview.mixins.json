@@ -8,11 +8,9 @@
     "maxShiftBy": 1
   },
   "mixins": [
-    "accessor.SWMRNibbleArrayAccessor",
     "listener.ConnectionMixin",
     "listener.MinecraftServerMixin",
     "listener.PlayerListMixin",
-    "listener.ServerChunkCacheMixin",
     "platform.ServerLevelMixin",
     "platform.ServerPlayerMixin"
   ],

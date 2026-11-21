@@ -26,7 +26,8 @@
     ]
   },
   "mixins": [
-    "betterview.mixins.json"
+    "betterview.mixins.json",
+    "betterview.moonrise.mixins.json"
   ],
 
   "depends": {

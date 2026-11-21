@@ -1,8 +1,6 @@
 package dev.booky.betterview.fabric.v263.packet;
 // Created by booky10 in BetterView (21:00 03.06.2025)
 
-import ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray;
-import dev.booky.betterview.fabric.v263.mixin.accessor.SWMRNibbleArrayAccessor;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -29,6 +27,9 @@ public final class LightWriter {
     @Contract("_, _, _, false -> !null")
     public static byte @Nullable [][] convertLightToBytes(ServerLevel level, LayerLightEventListener layer, ChunkPos pos, boolean allowEmpty) {
         int layerCount = MoonriseUtil.getTotalLightSections(level);
+        // light arrays are indexed from minSectionY-1, not from 0 (can make chunks look
+        // black, see LevelLightEngine.getMinLightSection)
+        int minLightSection = level.getMinSectionY() - 1;
         byte[][] layers = new byte[layerCount][];
         if (layer == LayerLightEventListener.DummyLightLayerEventListener.INSTANCE) {
             return !allowEmpty ? layers : null;
@@ -39,7 +40,8 @@ public final class LightWriter {
         if (layer instanceof LightEngine<?, ?> engine) {
             long sectionPosBase = ((pos.x() & 0x3FFFFFL) << (64 - 22)) | ((pos.z() & 0x3FFFFFL) << (64 - 22 - 22));
             for (int i = 0; i < layerCount; i++) {
-                DataLayer data = engine.storage.getDataLayerData(sectionPosBase | (i & 0xFFFFFL));
+                int sectionY = minLightSection + i;
+                DataLayer data = engine.storage.getDataLayerData(sectionPosBase | (sectionY & 0xFFFFFL));
                 if (data != null) {
                     layers[i] = data.getData();
                     nonEmpty = true;
@@ -47,7 +49,7 @@ public final class LightWriter {
             }
         } else {
             for (int i = 0; i < layerCount; i++) {
-                DataLayer data = layer.getDataLayerData(SectionPos.of(pos, i));
+                DataLayer data = layer.getDataLayerData(SectionPos.of(pos, minLightSection + i));
                 if (data != null) {
                     layers[i] = data.getData();
                     nonEmpty = true;
@@ -55,22 +57,6 @@ public final class LightWriter {
             }
         }
         return nonEmpty || !allowEmpty ? layers : null;
-    }
-
-    @Contract("_, false -> !null")
-    public static byte @Nullable [][] convertStarlightToBytes(SWMRNibbleArray[] layers, boolean allowEmpty) {
-        int layerCount = layers.length;
-        byte[][] byteLayers = new byte[layerCount][];
-        boolean converted = false;
-        for (int i = 0; i < layerCount; i++) {
-            SWMRNibbleArray layer = layers[i];
-            if (layer.isInitialisedVisible()) {
-                // bypass cloning by accessing underlying field
-                byteLayers[i] = ((SWMRNibbleArrayAccessor) (Object) layer).getStorageVisible();
-                converted = true;
-            }
-        }
-        return converted || !allowEmpty ? byteLayers : null;
     }
 
     public static void writeLightData(ByteBuf buf, byte[][] blockLight, byte @Nullable [][] skyLight) {
